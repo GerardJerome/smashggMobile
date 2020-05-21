@@ -1,4 +1,4 @@
-query TournamentQuery($slug: String = "test") {
+query TournamentQuery($slug: String!) {
     tournament(slug: $slug){
         id
         name
@@ -8,3 +8,31 @@ query TournamentQuery($slug: String = "test") {
         }
     }
 }
+
+
+query EventEntrants($eventId: ID = 398652, $page: Int = 1 , $perPage: Int = 20) {
+    event(id: $eventId) {
+        id
+        name
+        entrants(query: {
+            page: $page
+            perPage: $perPage
+        }) {
+            pageInfo {
+                total
+                totalPages
+            }
+            nodes {
+                id
+                participants {
+                    id
+                    gamerTag
+                    user{
+                        id
+                        slug
+                    }
+                }
+            }
+        }
+    }
+},

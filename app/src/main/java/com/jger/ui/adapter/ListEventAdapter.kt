@@ -1,9 +1,11 @@
 package com.jger.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.TournamentQuery
+import com.jger.R
 
 class ListEventAdapter(listEvents: List<TournamentQuery.Event?>?) : RecyclerView.Adapter<ListEventAdapter.EventViewHolder>() {
 lateinit var  listEvent : List<TournamentQuery.Event>
@@ -13,7 +15,8 @@ lateinit var  listEvent : List<TournamentQuery.Event>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
-        return 
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.card_view_layout,parent,false)
+        return EventViewHolder(view)
     }
 
     override fun getItemCount(): Int {
@@ -21,6 +24,6 @@ lateinit var  listEvent : List<TournamentQuery.Event>
     }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        holder.
     }
 }

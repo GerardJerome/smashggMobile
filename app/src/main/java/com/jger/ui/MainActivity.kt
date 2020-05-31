@@ -1,5 +1,6 @@
 package com.jger.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,8 +9,10 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.TournamentQuery
 import com.jger.R
+import com.jger.transferClass.EventTransfer
 import com.jger.util.ApolloUtil
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,7 +31,8 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         override fun onResponse(response: Response<TournamentQuery.Data>) {
-                            Log.d("jerom", response.data!!.tournament!!.events!!.get(0)!!.name)
+                            EventTransfer.listEvents=response.data!!.tournament!!.events!!
+                            startActivity(Intent(this@MainActivity,ListEventActivity::class.java))
                         }
 
                     })

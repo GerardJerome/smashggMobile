@@ -5,6 +5,11 @@ query TournamentQuery($slug: String!) {
         events {
             id
             name
+            numEntrants
+            startAt
+            videogame{
+                name
+            }
         }
     }
 },

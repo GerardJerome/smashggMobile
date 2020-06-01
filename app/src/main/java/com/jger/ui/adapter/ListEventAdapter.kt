@@ -25,5 +25,8 @@ class ListEventAdapter(val listEvents: List<TournamentQuery.Event?>?) : Recycler
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         holder.itemView.findViewById<TextView>(R.id.event_name_txt).text= listEvents!![position]!!.name
+        holder.itemView.findViewById<TextView>(R.id.nombre_entrant_txt).text =
+            """${listEvents!![position]!!.numEntrants.toString()} participant(s)"""
+        holder.itemView.findViewById<TextView>(R.id.start_at_txt).text = listEvents!![position]!!.startAt.
     }
 }

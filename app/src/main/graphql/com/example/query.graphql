@@ -9,6 +9,11 @@ query TournamentQuery($slug: String!) {
             startAt
             videogame{
                 name
+                images {
+                    id
+                    url
+
+                }
             }
         }
     }

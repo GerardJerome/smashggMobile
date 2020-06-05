@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if(newText!!.length>3) {
                     ApolloUtil.apolloClient
-                        .query(TempQuery("Wanted")).requestHeaders(ApolloUtil.clientHeader)
+                        .query(TempQuery(newText)).requestHeaders(ApolloUtil.clientHeader)
                         .enqueue(object : ApolloCall.Callback<TempQuery.Data>() {
                             override fun onFailure(e: ApolloException) {
                                 TODO("Not yet implemented")

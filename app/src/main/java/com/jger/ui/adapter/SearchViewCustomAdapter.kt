@@ -36,10 +36,12 @@ class SearchViewCustomAdapter(val context : Context, var listTournament: List<Te
     }
 
     override fun onBindViewHolder(holder: TournamentViewHolder, position: Int) {
-        holder.itemView.findViewById<TextView>(R.id.event_name_txt).text= listTournament!![position]!!.name
+        holder.itemView.findViewById<TextView>(R.id.tournament_name_txt).text= listTournament!![position]!!.name
         holder.itemView.findViewById<TextView>(R.id.contact_txt).text = listTournament!![position]!!.primaryContact
-        Picasso.get().load(listTournament!![position]!!.images!![0]!!.url).resize(200,400)
-            .into(holder.itemView.findViewById<ImageView>(R.id.tournament_image))
+        if(listTournament!![position]!!.images!!.isNotEmpty()) {
+            Picasso.get().load(listTournament!![position]!!.images!![0]!!.url).resize(200, 400)
+                .into(holder.itemView.findViewById<ImageView>(R.id.tournament_image))
+        }
 
     }
 

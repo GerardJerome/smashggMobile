@@ -19,6 +19,33 @@ query TournamentQuery($slug: String!) {
     }
 },
 
+query Temp($pattern : String!) {
+    tournaments(query: {
+        filter: {
+            name: $pattern
+        }
+        page: 1
+        perPage: 10
+        sortBy: "id ASC"
+    }) {
+        pageInfo {
+            total,
+            totalPages
+        }
+        nodes {
+            id,
+            name,
+            images{
+                url
+            }
+            ,
+            primaryContact,
+            slug
+
+        }
+    }
+}
+
 
 
 query EventEntrants($eventId: ID = 398652, $page: Int = 1 , $perPage: Int = 20) {

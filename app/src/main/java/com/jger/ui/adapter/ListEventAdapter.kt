@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.TournamentQuery
 import com.jger.R
+import com.jger.transferClass.SetTransfer
 import com.jger.ui.BracketViewerActivity
 import com.squareup.picasso.Picasso
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,7 +43,8 @@ class ListEventAdapter(val listEvents: List<TournamentQuery.Event?>?) : Recycler
             .into(holder.itemView.findViewById<ImageView>(R.id.game_image))
         holder.itemView.setOnClickListener { v ->
             run {
-                holder.itemView.context.startActivity(Intent(holder.itemView.context,BracketViewerActivity::class.java).putExtra("EventId",listEvents!![position]!!.id))
+                SetTransfer.sets=listEvents!![position]!!.sets!!
+                holder.itemView.context.startActivity(Intent(holder.itemView.context,BracketViewerActivity::class.java))
             }
         }
     }

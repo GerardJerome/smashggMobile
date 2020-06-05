@@ -41,7 +41,11 @@ class SearchViewCustomAdapter(val context : Context, var listTournament: List<Te
     }
 
     override fun getItemCount(): Int {
-        return listTournament!!.size
+        return if(listTournament!=null) {
+            listTournament!!.size
+        }else{
+            0
+        }
     }
 
     override fun onBindViewHolder(holder: TournamentViewHolder, position: Int) {

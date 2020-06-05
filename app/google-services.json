@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "190511184195",
+    "firebase_url": "https://smashggmobile.firebaseio.com",
+    "project_id": "smashggmobile",
+    "storage_bucket": "smashggmobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190511184195:android:8b48b1b40783306fcf57f6",
+        "android_client_info": {
+          "package_name": "com.jger.smashGGMobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "190511184195-udphd5i4kbc09a6706u4ri23eh6jb5nu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jger.smashGGMobile",
+            "certificate_hash": "d9f07a9a7c070427f5a70996916220223ada81ea"
+          }
+        },
+        {
+          "client_id": "190511184195-mo39t6klr83kflicobd8rucd79emqoiq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcRrvRLtWV2JvM2J9n6VeKvdk8I4D2aFA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "190511184195-mo39t6klr83kflicobd8rucd79emqoiq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

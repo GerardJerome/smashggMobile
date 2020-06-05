@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.jger.BracketVisualizer.Fragment.BracketsFragment
 import com.jger.R
-import kotlinx.android.synthetic.main.activity_bracket_viewer.*
+import com.jger.transferClass.SetTransfer
 
 class BracketViewerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,7 @@ class BracketViewerActivity : AppCompatActivity() {
 
 
     private fun initialiseBracketsFragment() {
-        bracketFragment = BracketsFragment()
+        bracketFragment = BracketsFragment(SetTransfer.sets)
         val manager: FragmentManager = supportFragmentManager
         val transaction: FragmentTransaction = manager.beginTransaction()
         transaction.replace(R.id.containeur, bracketFragment!!, "brackets_home_fragment")

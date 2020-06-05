@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
+import com.example.TournamentQuery
 import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.customviews.WrapContentHeightViewPager
 import com.jger.BracketVisualizer.model.ColomnData
@@ -20,7 +21,7 @@ import java.util.*
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment : Fragment(), ViewPager.OnPageChangeListener {
+class BracketsFragment(sets: TournamentQuery.Sets) : Fragment(), ViewPager.OnPageChangeListener {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
     private var sectionList: ArrayList<ColomnData>? = null

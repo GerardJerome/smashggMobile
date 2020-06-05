@@ -7,6 +7,11 @@ query TournamentQuery($slug: String!) {
             name
             numEntrants
             startAt
+            sets{
+                nodes{
+                    displayScore
+                }
+            }
             videogame{
                 name
                 images {
@@ -25,8 +30,8 @@ query Temp($pattern : String!) {
             name: $pattern
         }
         page: 1
-        perPage: 10
-        sortBy: "id ASC"
+        perPage: 999
+        sortBy: "id DESC"
     }) {
         pageInfo {
             total,

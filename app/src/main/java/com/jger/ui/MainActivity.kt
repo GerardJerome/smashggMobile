@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity() {
         TournamentRecyclerView.layoutManager=LinearLayoutManager(this)
         tournament_sView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-                TODO("Not yet implemented")
+                onQueryTextChange(query)
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -51,29 +52,5 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-
-
-        /*search_btn.setOnClickListener { v ->
-            run {
-                ApolloUtil.apolloClient
-                    .query(TournamentQuery("tournament/" + tournament_txt.text.toString()
-                        .replace("[^A-Za-z0-9 ]", "-")
-                        .replace(" ","-")
-                        .replace("-{2,}","-")
-                        .replace("-$","")))
-                    .requestHeaders(ApolloUtil.clientHeader)
-                    .enqueue(object : ApolloCall.Callback<TournamentQuery.Data>() {
-                        override fun onFailure(e: ApolloException) {
-                            Log.d("jerom", e.toString())
-                        }
-
-                        override fun onResponse(response: Response<TournamentQuery.Data>) {
-                            EventTransfer.listEvents=response.data!!.tournament!!.events!!
-                            startActivity(Intent(this@MainActivity,ListEventActivity::class.java))
-                        }
-
-                    })
-            }
-        }*/
     }
 }

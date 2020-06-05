@@ -10,6 +10,7 @@ query TournamentQuery($slug: String!) {
             sets{
                 nodes{
                     displayScore
+                    round
                 }
             }
             videogame{

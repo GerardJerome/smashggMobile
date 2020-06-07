@@ -7,12 +7,7 @@ query TournamentQuery($slug: String!) {
             name
             numEntrants
             startAt
-            sets{
-                nodes{
-                    displayScore
-                    round
-                }
-            }
+            slug
             videogame{
                 name
                 images {
@@ -23,7 +18,32 @@ query TournamentQuery($slug: String!) {
             }
         }
     }
-},
+}
+
+query eventQueryForPhaseId($slug : String!){
+    event(slug : $slug){
+        id
+        name
+        phases{
+            id
+            name
+            groupCount
+        }
+    }
+}
+
+query phaseById($id : ID!){
+    phase(id :$id){
+
+        phaseGroups{
+            nodes{
+                displayIdentifier
+                id
+            }
+        }
+    }
+}
+
 
 query Temp($pattern : String!) {
     tournaments(query: {

@@ -21,7 +21,7 @@ import java.util.*
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment(val sets: TournamentQuery.Sets) : Fragment(), ViewPager.OnPageChangeListener {
+class BracketsFragment() : Fragment(), ViewPager.OnPageChangeListener {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
     private var sectionList: ArrayList<ColomnData>? = null
@@ -53,7 +53,6 @@ class BracketsFragment(val sets: TournamentQuery.Sets) : Fragment(), ViewPager.O
 
 
     private fun setData() {
-        val toto = sets.nodes!!.groupBy { node: TournamentQuery.Node? -> node!!.round }
         sectionList = ArrayList<ColomnData>()
         val Colomn1matchesList: ArrayList<MatchData> = ArrayList<MatchData>()
         val colomn2MatchesList: ArrayList<MatchData> = ArrayList<MatchData>()

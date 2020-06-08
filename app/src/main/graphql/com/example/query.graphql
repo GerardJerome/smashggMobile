@@ -44,6 +44,29 @@ query phaseById($id : ID!){
     }
 }
 
+query phaseGroupByPhaseId($id : ID){
+    phase(id : $id){
+        phaseGroups{
+            nodes{
+                id
+                displayIdentifier
+            }
+        }
+    }
+}
+
+query matchByPhaseGroupId($id : ID){
+    phaseGroup(id : $id){
+        sets(perPage:999){
+            nodes{
+                identifier
+                displayScore
+                round
+            }
+        }
+    }
+}
+
 
 query Temp($pattern : String!) {
     tournaments(query: {
@@ -52,7 +75,6 @@ query Temp($pattern : String!) {
         }
         page: 1
         perPage: 999
-        sortBy: "id DESC"
     }) {
         pageInfo {
             total,

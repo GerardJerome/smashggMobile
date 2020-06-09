@@ -30,8 +30,10 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
     private var sectionList: ArrayList<ColomnData>? = null
     private var mNextSelectedScreen = 0
     private val mCurrentPagerState = 0
-    private val sortedMatchByRoundWinnerBracket = HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
-    private val sortedMatchByRoundLoserBracket = HashMap<Int?,List<MatchByPhaseGroupIdQuery.Node?>>()
+    private val sortedMatchByRoundWinnerBracket =
+        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
+    private val sortedMatchByRoundLoserBracket =
+        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
 
     @Nullable
     override fun onCreateView(
@@ -42,8 +44,8 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
         sortedMatchByRound.onEach { entry ->
             if (entry.key!! > 0) {
                 sortedMatchByRoundWinnerBracket[entry.key] = entry.value
-            }else{
-                sortedMatchByRoundLoserBracket[entry.key]=entry.value
+            } else {
+                sortedMatchByRoundLoserBracket[entry.key] = entry.value
             }
         }
 
@@ -70,70 +72,41 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
             var matchByPhase = ArrayList<MatchData>()
             sortedMatchByRoundWinnerBracket[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
                 val matchScoreArray = node!!.displayScore!!.split("-")
-                if(matchScoreArray.size>1) {
+                if (matchScoreArray.size > 1) {
+                    val regex = "([\\w|\\||\\s|-]+?)(\\d)\\s-\\s([\\w|\\||\\s|-]+)(\\d)".toRegex()
+                    val test = regex.find(node!!.displayScore!!, 0)
+                    val groupValue = test!!.groupValues
                     var matchData = MatchData(
                         CompetitorData(
-                            matchScoreArray[0].trim().dropLast(1),
-                            matchScoreArray[0].trim().toCharArray().last().toString()
+                            groupValue[1].trim(),
+                            groupValue[2].trim()
                         ),
                         CompetitorData(
-                            matchScoreArray[1].trim().dropLast(1),
-                            matchScoreArray[1].trim().toCharArray().last().toString()
+                            groupValue[3].trim(),
+                            groupValue[4].trim()
                         )
                     )
                     matchByPhase.add(matchData)
-                }else{
-                    matchByPhase.add(MatchData(CompetitorData("dq","dq"),CompetitorData("DQ","DQ")))
+                } else {
+                    matchByPhase.add(
+                        MatchData(
+                            CompetitorData("dq", "dq"),
+                            CompetitorData("DQ", "DQ")
+                        )
+                    )
                 }
             }
             sectionList!!.add(ColomnData(matchByPhase))
         })
-        /*val Colomn1matchesList: ArrayList<MatchData> = ArrayList<MatchData>()
-        val colomn2MatchesList: ArrayList<MatchData> = ArrayList<MatchData>()
-        val colomn3MatchesList: ArrayList<MatchData> = ArrayList<MatchData>()
-        val competitorOne = CompetitorData("Manchester United Fc", "2")
-        val competitorTwo = CompetitorData("Arsenal", "1")
-        val competitorThree = CompetitorData("Chelsea", "2")
-        val competitorFour = CompetitorData("Tottenham", "1")
-        val competitorFive = CompetitorData("Manchester FC", "2")
-        val competitorSix = CompetitorData("Liverpool", "4")
-        val competitorSeven = CompetitorData("West ham ", "2")
-        val competitorEight = CompetitorData("Bayern munich", "1")
-        val matchData1 = MatchData(competitorOne, competitorTwo)
-        val matchData2 = MatchData(competitorThree, competitorFour)
-        val matchData3 = MatchData(competitorFive, competitorSix)
-        val matchData4 = MatchData(competitorSeven, competitorEight)
-        Colomn1matchesList.add(matchData1)
-        Colomn1matchesList.add(matchData2)
-        Colomn1matchesList.add(matchData3)
-        Colomn1matchesList.add(matchData4)
-        val colomnData1 = ColomnData(Colomn1matchesList)
-        sectionList!!.add(colomnData1)
-        val competitorNine = CompetitorData("Manchester United Fc", "2")
-        val competitorTen = CompetitorData("Chelsea", "4")
-        val competitorEleven = CompetitorData("Liverpool", "2")
-        val competitorTwelve = CompetitorData("westham", "1")
-        val matchData5 = MatchData(competitorNine, competitorTen)
-        val matchData6 = MatchData(competitorEleven, competitorTwelve)
-        colomn2MatchesList.add(matchData5)
-        colomn2MatchesList.add(matchData6)
-        val colomnData2 = ColomnData(colomn2MatchesList)
-        sectionList!!.add(colomnData2)
-        val competitorThirteen = CompetitorData("Chelsea", "2")
-        val competitorForteen = CompetitorData("Liverpool", "1")
-        val matchData7 = MatchData(competitorThirteen, competitorForteen)
-        colomn3MatchesList.add(matchData7)
-        val colomnData3 = ColomnData(colomn3MatchesList)
-        sectionList!!.add(colomnData3)*/
     }
 
     private fun intialiseViewPagerAdapter() {
-        sectionAdapter = BracketsSectionAdapter(getChildFragmentManager(), sectionList!!)
-        viewPager!!.setOffscreenPageLimit(10)
-        viewPager!!.setAdapter(sectionAdapter)
-        viewPager!!.setCurrentItem(0)
-        viewPager!!.setPageMargin(-200)
-        viewPager!!.setHorizontalFadingEdgeEnabled(true)
+        sectionAdapter = BracketsSectionAdapter(childFragmentManager, sectionList!!)
+        viewPager!!.offscreenPageLimit = 10
+        viewPager!!.adapter = sectionAdapter
+        viewPager!!.currentItem = 0
+        viewPager!!.pageMargin = -200
+        viewPager!!.isHorizontalFadingEdgeEnabled = true
         viewPager!!.setFadingEdgeLength(50)
         viewPager!!.addOnPageChangeListener(this)
     }

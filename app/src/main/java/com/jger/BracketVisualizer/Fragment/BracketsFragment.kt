@@ -17,16 +17,21 @@ import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
 import kotlinx.android.synthetic.main.fragment_brackts.*
 import java.util.*
+import java.util.function.Consumer
+import kotlin.collections.HashMap
 
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment(sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) : Fragment(), ViewPager.OnPageChangeListener {
+class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
+    Fragment(), ViewPager.OnPageChangeListener {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
     private var sectionList: ArrayList<ColomnData>? = null
     private var mNextSelectedScreen = 0
     private val mCurrentPagerState = 0
+    private val sortedMatchByRoundWinnerBracket = HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
+    private val sortedMatchByRoundLoserBracket = HashMap<Int?,List<MatchByPhaseGroupIdQuery.Node?>>()
 
     @Nullable
     override fun onCreateView(
@@ -34,6 +39,14 @@ class BracketsFragment(sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGrou
         @Nullable container: ViewGroup?,
         @Nullable savedInstanceState: Bundle?
     ): View {
+        sortedMatchByRound.onEach { entry ->
+            if (entry.key!! > 0) {
+                sortedMatchByRoundWinnerBracket[entry.key] = entry.value
+            }else{
+                sortedMatchByRoundLoserBracket[entry.key]=entry.value
+            }
+        }
+
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
             containeurs
@@ -44,17 +57,38 @@ class BracketsFragment(sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGrou
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewPager=containeurs
+        viewPager = containeurs
         initViews()
         setData()
         intialiseViewPagerAdapter()
     }
 
 
-
     private fun setData() {
         sectionList = ArrayList<ColomnData>()
-        val Colomn1matchesList: ArrayList<MatchData> = ArrayList<MatchData>()
+        sortedMatchByRoundWinnerBracket.keys.forEach(Consumer {
+            var matchByPhase = ArrayList<MatchData>()
+            sortedMatchByRoundWinnerBracket[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
+                val matchScoreArray = node!!.displayScore!!.split("-")
+                if(matchScoreArray.size>1) {
+                    var matchData = MatchData(
+                        CompetitorData(
+                            matchScoreArray[0].trim().dropLast(1),
+                            matchScoreArray[0].trim().toCharArray().last().toString()
+                        ),
+                        CompetitorData(
+                            matchScoreArray[1].trim().dropLast(1),
+                            matchScoreArray[1].trim().toCharArray().last().toString()
+                        )
+                    )
+                    matchByPhase.add(matchData)
+                }else{
+                    matchByPhase.add(MatchData(CompetitorData("dq","dq"),CompetitorData("DQ","DQ")))
+                }
+            }
+            sectionList!!.add(ColomnData(matchByPhase))
+        })
+        /*val Colomn1matchesList: ArrayList<MatchData> = ArrayList<MatchData>()
         val colomn2MatchesList: ArrayList<MatchData> = ArrayList<MatchData>()
         val colomn3MatchesList: ArrayList<MatchData> = ArrayList<MatchData>()
         val competitorOne = CompetitorData("Manchester United Fc", "2")
@@ -90,7 +124,7 @@ class BracketsFragment(sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGrou
         val matchData7 = MatchData(competitorThirteen, competitorForteen)
         colomn3MatchesList.add(matchData7)
         val colomnData3 = ColomnData(colomn3MatchesList)
-        sectionList!!.add(colomnData3)
+        sectionList!!.add(colomnData3)*/
     }
 
     private fun intialiseViewPagerAdapter() {
@@ -107,7 +141,6 @@ class BracketsFragment(sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGrou
     private fun initViews() {
         //itojzej
     }
-
 
 
     override fun onPageScrolled(

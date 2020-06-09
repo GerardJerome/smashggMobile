@@ -28,6 +28,11 @@ query eventQueryForPhaseId($slug : String!){
             id
             name
             groupCount
+            phaseGroups{
+                nodes{
+                    id
+                }
+            }
         }
     }
 }

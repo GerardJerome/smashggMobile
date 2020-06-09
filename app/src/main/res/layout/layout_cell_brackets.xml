@@ -25,7 +25,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@+id/play_date"
                 android:alpha="0.3"
-                android:text="Match title"
+                android:text=""
                 android:textColor="#ffffff"
                 android:gravity="bottom"
                 android:paddingBottom="5dp"

@@ -42,12 +42,15 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
         @Nullable savedInstanceState: Bundle?
     ): View {
         sortedMatchByRound.onEach { entry ->
+            entry.value.sortedBy { node -> node!!.identifier }
             if (entry.key!! > 0) {
                 sortedMatchByRoundWinnerBracket[entry.key] = entry.value
             } else {
                 sortedMatchByRoundLoserBracket[entry.key] = entry.value
             }
+
         }
+
 
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
@@ -73,7 +76,7 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
             sortedMatchByRoundWinnerBracket[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
                 val matchScoreArray = node!!.displayScore!!.split("-")
                 if (matchScoreArray.size > 1) {
-                    val regex = "([\\w|\\||\\s|-]+?)(\\d)\\s-\\s([\\w|\\||\\s|-]+)(\\d)".toRegex()
+                    val regex = "([[:ascii:]|\\p{L}]+)(\\d)+?\\s-\\s([[:ascii:]|\\p{L}]+)(\\d)".toRegex()
                     val test = regex.find(node!!.displayScore!!, 0)
                     val groupValue = test!!.groupValues
                     var matchData = MatchData(

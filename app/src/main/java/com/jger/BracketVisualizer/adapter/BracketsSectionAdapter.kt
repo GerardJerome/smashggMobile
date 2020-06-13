@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.jger.BracketVisualizer.Fragment.BracketsColomnFragment
 import com.jger.BracketVisualizer.model.ColomnData
+import com.jger.transferClass.Test
 import java.util.*
 
 /**
@@ -35,7 +36,6 @@ class BracketsSectionAdapter(
     override fun getCount(): Int {
         return sectionList.size
     }
-
 
 
     init {

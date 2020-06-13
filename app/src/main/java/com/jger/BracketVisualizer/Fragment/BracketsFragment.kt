@@ -7,7 +7,12 @@ import android.view.ViewGroup
 import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
+import com.apollographql.apollo.ApolloCall
+import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Response
+import com.apollographql.apollo.exception.ApolloException
 import com.example.MatchByPhaseGroupIdQuery
+import com.example.SetResultForDQQuery
 import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.customviews.WrapContentHeightViewPager
 import com.jger.BracketVisualizer.model.ColomnData
@@ -15,15 +20,18 @@ import com.jger.BracketVisualizer.model.CompetitorData
 import com.jger.BracketVisualizer.model.MatchData
 import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
+import com.jger.transferClass.Test
+import com.jger.util.ApolloUtil
 import kotlinx.android.synthetic.main.fragment_brackts.*
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
+class BracketsFragment(var sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
     Fragment(), ViewPager.OnPageChangeListener {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
@@ -34,6 +42,8 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
         HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
     private val sortedMatchByRoundLoserBracket =
         HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
+    private var wait = false
+    private var listIdTreated = ArrayList<String>()
 
     @Nullable
     override fun onCreateView(
@@ -74,36 +84,88 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
         sortedMatchByRoundWinnerBracket.keys.forEach(Consumer {
             var matchByPhase = ArrayList<MatchData>()
             sortedMatchByRoundWinnerBracket[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
-                val matchScoreArray = node!!.displayScore!!.split("-")
-                if (matchScoreArray.size > 1) {
-                    val regex = "([[:ascii:]|\\p{L}]+)(\\d)+?\\s-\\s([[:ascii:]|\\p{L}]+)(\\d)".toRegex()
-                    val test = regex.find(node!!.displayScore!!, 0)
-                    val groupValue = test!!.groupValues
-                    var matchData = MatchData(
-                        CompetitorData(
-                            groupValue[1].trim(),
-                            groupValue[2].trim()
-                        ),
-                        CompetitorData(
-                            groupValue[3].trim(),
-                            groupValue[4].trim()
-                        )
-                    )
-                    matchByPhase.add(matchData)
+                if (node!!.displayScore!!.compareTo("DQ") == 0) {
+
+                    wait=true
+                    ApolloUtil.apolloClient
+                        .query(SetResultForDQQuery(node!!.id!!))
+                        .requestHeaders(
+                            ApolloUtil.clientHeader
+                        ).enqueue(object : ApolloCall.Callback<SetResultForDQQuery.Data>() {
+                            override fun onFailure(e: ApolloException) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onResponse(response: Response<SetResultForDQQuery.Data>) {
+                                if (response.data!!.set!!.slots!![0]!!.standing!!.stats!!.score!!.value == ((-1).toDouble())) {
+                                    var matchData = MatchData(
+                                        CompetitorData(
+                                            response.data!!.set!!.slots!![0]!!.standing!!.entrant!!.name,
+                                            "DQ"
+                                        ),
+                                        CompetitorData(
+                                            response.data!!.set!!.slots!![1]!!.standing!!.entrant!!.name,
+                                            "Win"
+                                        ),
+                                        response.data!!.set!!.identifier
+
+
+                                    )
+                                    listIdTreated.add(node!!.id!!)
+                                    matchByPhase.add(matchData)
+                                } else if (response.data!!.set!!.slots!![1]!!.standing!!.stats!!.score!!.value == ((-1).toDouble())) {
+                                    var matchData = MatchData(
+                                        CompetitorData(
+                                            response.data!!.set!!.slots!![1]!!.standing!!.entrant!!.name,
+                                            "DQ"
+                                        ),
+                                        CompetitorData(
+                                            response.data!!.set!!.slots!![0]!!.standing!!.entrant!!.name,
+                                            "Win"
+                                        ),
+                                        response.data!!.set!!.identifier
+                                    )
+                                    listIdTreated.add(node!!.id!!)
+                                    matchByPhase.add(matchData)
+                                }
+                                wait=false
+                            }
+
+                        })
                 } else {
-                    matchByPhase.add(
-                        MatchData(
-                            CompetitorData("dq", "dq"),
-                            CompetitorData("DQ", "DQ")
+                    val matchScoreArray = node!!.displayScore!!.split("-")
+                    if (matchScoreArray.size > 1) {
+                        val regex =
+                            "([[:ascii:]|\\p{L}]+)(\\d)+?\\s-\\s([[:ascii:]|\\p{L}]+)(\\d)".toRegex()
+                        val test = regex.find(node!!.displayScore!!, 0)
+                        val groupValue = test!!.groupValues
+                        var matchData = MatchData(
+                            CompetitorData(
+                                groupValue[1].trim(),
+                                groupValue[2].trim()
+                            ),
+                            CompetitorData(
+                                groupValue[3].trim(),
+                                groupValue[4].trim()
+                            ),
+                            node!!.identifier
                         )
-                    )
+                        listIdTreated.add(node!!.id!!)
+                        matchByPhase.add(matchData)
+                    }
                 }
             }
-            sectionList!!.add(ColomnData(matchByPhase))
+            while (listIdTreated.size!= sortedMatchByRoundWinnerBracket[it]!!.size){
+                Thread.sleep(100)
+            }
+            val matchTrie = (matchByPhase.sortedWith(compareBy( {it.identifier.length},{it.identifier})))
+            sectionList!!.add(ColomnData(ArrayList(matchTrie)))
+            listIdTreated.clear()
         })
     }
 
     private fun intialiseViewPagerAdapter() {
+        Test.listParticipant.clear()
         sectionAdapter = BracketsSectionAdapter(childFragmentManager, sectionList!!)
         viewPager!!.offscreenPageLimit = 10
         viewPager!!.adapter = sectionAdapter
@@ -131,12 +193,17 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
                 if (position + 1 != mNextSelectedScreen) {
                     mNextSelectedScreen = position + 1
                     //update view here
-                    if (getBracketsFragment(position)!!.colomnList[0].height
-                        !== BracketsUtility.dpToPx(131)
-                    ) getBracketsFragment(position)!!.shrinkView(BracketsUtility.dpToPx(131))
+                    if (getBracketsFragment(position)!!.colomnList[0].height !== BracketsUtility.dpToPx(
+                            131
+                        )
+                    ) {
+                        getBracketsFragment(position)!!.shrinkView(BracketsUtility.dpToPx(131))
+                    }
                     if (getBracketsFragment(position + 1)!!.colomnList[0].height
                         !== BracketsUtility.dpToPx(131)
-                    ) getBracketsFragment(position + 1)!!.shrinkView(BracketsUtility.dpToPx(131))
+                    ) {
+                        getBracketsFragment(position + 1)!!.shrinkView(BracketsUtility.dpToPx(131))
+                    }
                 }
             } else {
                 // Closer to current screen than to next
@@ -154,11 +221,7 @@ class BracketsFragment(val sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
                         val previousFragmentSize =
                             getBracketsFragment(position + 1)!!.previousBracketSize
                         if (currentFragmentSize != previousFragmentSize) {
-                            getBracketsFragment(position + 1)!!.expandHeight(
-                                BracketsUtility.dpToPx(
-                                    262
-                                )
-                            )
+                            getBracketsFragment(position + 1)!!.resetView()
                             getBracketsFragment(position)!!.shrinkView(BracketsUtility.dpToPx(131))
                         }
                     }

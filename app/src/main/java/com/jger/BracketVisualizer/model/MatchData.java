@@ -11,6 +11,8 @@ public class MatchData implements Serializable {
     private CompetitorData competitorOne;
     private CompetitorData competitorTwo;
     private int height;
+    private int OriginalHeight;
+    private String identifier;
 
     public int getHeight() {
         return height;
@@ -20,9 +22,18 @@ public class MatchData implements Serializable {
         this.height = height;
     }
 
-    public MatchData(CompetitorData competitorOne, CompetitorData competitorTwo) {
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public MatchData(CompetitorData competitorOne, CompetitorData competitorTwo,String identifier) {
         this.competitorOne = competitorOne;
         this.competitorTwo = competitorTwo;
+        this.identifier=identifier;
     }
 
     public CompetitorData getCompetitorTwo() {
@@ -40,5 +51,13 @@ public class MatchData implements Serializable {
 
     public void setCompetitorOne(CompetitorData competitorOne) {
         this.competitorOne = competitorOne;
+    }
+
+    public int getOriginalHeight() {
+        return OriginalHeight;
+    }
+
+    public void setOriginalHeight(int originalHeight) {
+        OriginalHeight = originalHeight;
     }
 }

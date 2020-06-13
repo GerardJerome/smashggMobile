@@ -26,8 +26,10 @@ class BracketViewerActivity : AppCompatActivity() {
 
     private fun initialiseBracketsFragment() {
         ApolloUtil.apolloClient
-            .query(MatchByPhaseGroupIdQuery(Input.fromNullable(intent.getStringExtra("phaseGroupId")))).requestHeaders(
-                ApolloUtil.clientHeader)
+            .query(MatchByPhaseGroupIdQuery(Input.fromNullable(intent.getStringExtra("phaseGroupId"))))
+            .requestHeaders(
+                ApolloUtil.clientHeader
+            )
             .enqueue(object : ApolloCall.Callback<MatchByPhaseGroupIdQuery.Data>() {
                 override fun onFailure(e: ApolloException) {
                     TODO("Not yet implemented")
@@ -35,13 +37,22 @@ class BracketViewerActivity : AppCompatActivity() {
 
                 override fun onResponse(response: Response<MatchByPhaseGroupIdQuery.Data>) {
                     val listSet = response.data!!.phaseGroup!!.sets!!.nodes
-                    val matchByRound = listSet!!.groupBy { node: MatchByPhaseGroupIdQuery.Node? -> node!!.round }
-                    val sortedMatchByRound = matchByRound.toSortedMap(compareBy { it})
+                    val matchByRound =
+                        listSet!!.groupBy { node: MatchByPhaseGroupIdQuery.Node? -> node!!.round } as HashMap
+                    matchByRound.forEach { entry ->
+                        val listtrie = entry.value.sortedWith(compareBy({it!!.identifier!!.length},{it!!.identifier}))
+                        matchByRound[entry.key] = listtrie
+                    }
+                    val sortedMatchByRound = matchByRound.toSortedMap(compareBy { it })
                     this@BracketViewerActivity.runOnUiThread {
                         bracketFragment = BracketsFragment(sortedMatchByRound)
                         val manager: FragmentManager = supportFragmentManager
                         val transaction: FragmentTransaction = manager.beginTransaction()
-                        transaction.replace(R.id.containeur, bracketFragment!!, "brackets_home_fragment")
+                        transaction.replace(
+                            R.id.containeur,
+                            bracketFragment!!,
+                            "brackets_home_fragment"
+                        )
                         transaction.commit()
                         manager.executePendingTransactions()
                     }

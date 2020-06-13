@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jger.BracketVisualizer.adapter.BracketsCellAdapter
 import com.jger.BracketVisualizer.model.ColomnData
+import com.jger.BracketVisualizer.model.CompetitorData
 import com.jger.BracketVisualizer.model.MatchData
 import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
+import com.jger.transferClass.Test
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -29,6 +31,7 @@ class BracketsColomnFragment : Fragment() {
     private var list: ArrayList<MatchData> = ArrayList()
     private var bracketsRV: RecyclerView? = null
     private var adapter: BracketsCellAdapter? = null
+
 
     @Nullable
     override fun onCreateView(
@@ -70,16 +73,31 @@ class BracketsColomnFragment : Fragment() {
 
     private fun setInitialHeightForList() {
         for (data in list!!) {
-            if (sectionNumber == 0) {
+            val newPlayer = Test.listParticipant.size>0 && !Test.listParticipant.contains(data.competitorOne.name) || !Test.listParticipant.contains(data.competitorTwo.name)
+            if(newPlayer){
+               data.height=(BracketsUtility.dpToPx(131))
+                data.originalHeight=(BracketsUtility.dpToPx(131))
+            }else if (sectionNumber == 0) {
                 data.setHeight(BracketsUtility.dpToPx(131))
-            } else if (sectionNumber == 1 && previousBracketSize != list!!.size) {
+                data.originalHeight=(BracketsUtility.dpToPx(131))
+            } else if (sectionNumber == 1 && previousBracketSize != list!!.size && !newPlayer) {
                 data.setHeight(BracketsUtility.dpToPx(262))
-            } else if (sectionNumber == 1 && previousBracketSize == list!!.size) {
+                data.originalHeight=(BracketsUtility.dpToPx(262))
+            } else if (sectionNumber == 1 && previousBracketSize == list!!.size && !newPlayer) {
                 data.setHeight(BracketsUtility.dpToPx(131))
-            } else if (previousBracketSize > list!!.size) {
+                data.originalHeight=BracketsUtility.dpToPx(131)
+            } else if (previousBracketSize > list!!.size && !newPlayer) {
                 data.setHeight(BracketsUtility.dpToPx(262))
-            } else if (previousBracketSize == list!!.size) {
+                data.originalHeight=BracketsUtility.dpToPx(262)
+            } else if (previousBracketSize == list!!.size && !newPlayer) {
                 data.setHeight(BracketsUtility.dpToPx(131))
+                data.originalHeight=BracketsUtility.dpToPx(131)
+            }
+            if(!Test.listParticipant.contains(data.competitorTwo.name)){
+                Test.listParticipant.add(data.competitorTwo.name)
+            }
+            if(!Test.listParticipant.contains(data.competitorOne.name)){
+                Test.listParticipant.add(data.competitorOne.name)
             }
         }
     }
@@ -112,6 +130,13 @@ class BracketsColomnFragment : Fragment() {
             bracketsRV!!.setLayoutManager(layoutManager)
             bracketsRV!!.setItemAnimator(DefaultItemAnimator())
         }
+    }
+
+    fun resetView() {
+        for(data in list){
+            data.height=data.originalHeight
+        }
+        adapter!!.setList(list)
     }
 
     val currentBracketSize: Int

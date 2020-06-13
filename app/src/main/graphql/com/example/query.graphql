@@ -64,9 +64,34 @@ query matchByPhaseGroupId($id : ID){
     phaseGroup(id : $id){
         sets(perPage:999){
             nodes{
+                id
                 identifier
                 displayScore
                 round
+            }
+        }
+    }
+}
+
+query SetResultForDQ($setId: ID!) {
+    set(id: $setId) {
+        id
+        displayScore
+        identifier
+        slots {
+            id
+            standing {
+                id
+                entrant{
+                    name
+                }
+                placement
+                stats {
+                    score {
+                        label
+                        value
+                    }
+                }
             }
         }
     }

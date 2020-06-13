@@ -48,6 +48,7 @@ class BracketsCellAdapter(
         viewHolder!!.teamTwoName.text = list[position].competitorTwo.name
         viewHolder!!.teamOneScore.text = list[position].competitorOne.score
         viewHolder!!.teamTwoScore.text = list[position].competitorTwo.score
+        viewHolder!!.identifier.text = list[position].identifier
     }
 
 

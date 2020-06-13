@@ -11,6 +11,7 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.TempQuery
 import com.example.TournamentQuery
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.R
 import com.jger.transferClass.EventTransfer
 import com.jger.ui.adapter.SearchViewCustomAdapter
@@ -18,26 +19,27 @@ import com.jger.util.ApolloUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    var adapter = SearchViewCustomAdapter(this,ArrayList())
+    var adapter = SearchViewCustomAdapter(this, ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        TournamentRecyclerView.adapter=adapter
-        TournamentRecyclerView.layoutManager=LinearLayoutManager(this)
-        tournament_sView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        TournamentRecyclerView.adapter = adapter
+        TournamentRecyclerView.layoutManager = LinearLayoutManager(this)
+        tournament_sView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 onQueryTextChange(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if(newText!!.length>2) {
+                if (newText!!.length > 2) {
                     ApolloUtil.apolloClient
                         .query(TempQuery(newText)).requestHeaders(ApolloUtil.clientHeader)
                         .enqueue(object : ApolloCall.Callback<TempQuery.Data>() {
                             override fun onFailure(e: ApolloException) {
-                                TODO("Not yet implemented")
+                                FirebaseCrashlytics.getInstance()
+                                    .log("Problème dans la requète de recherche de tournoi (pattern : $newText) : ${e.message}")
                             }
 
                             override fun onResponse(response: Response<TempQuery.Data>) {
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                         })
-            }
+                }
                 return true
             }
 

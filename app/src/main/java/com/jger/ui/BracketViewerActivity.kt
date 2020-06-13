@@ -11,7 +11,9 @@ import com.apollographql.apollo.exception.ApolloException
 import com.example.MatchByPhaseGroupIdQuery
 import com.jger.BracketVisualizer.Fragment.BracketsFragment
 import com.jger.R
+import com.jger.ui.adapter.BracketPagerAdapter
 import com.jger.util.ApolloUtil
+import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 
 class BracketViewerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +23,13 @@ class BracketViewerActivity : AppCompatActivity() {
 
     }
 
-    private var bracketFragment: BracketsFragment? = null
+    private var bracketWinnerFragment: BracketsFragment? = null
+    private var bracketLoserFragment : BracketsFragment? = null
+    lateinit var viewPagerAdapter : BracketPagerAdapter
+    private val sortedMatchByRoundWinnerBracket =
+        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
+    private val sortedMatchByRoundLoserBracket =
+        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
 
 
     private fun initialiseBracketsFragment() {
@@ -45,16 +53,18 @@ class BracketViewerActivity : AppCompatActivity() {
                     }
                     val sortedMatchByRound = matchByRound.toSortedMap(compareBy { it })
                     this@BracketViewerActivity.runOnUiThread {
-                        bracketFragment = BracketsFragment(sortedMatchByRound)
-                        val manager: FragmentManager = supportFragmentManager
-                        val transaction: FragmentTransaction = manager.beginTransaction()
-                        transaction.replace(
-                            R.id.containeur,
-                            bracketFragment!!,
-                            "brackets_home_fragment"
-                        )
-                        transaction.commit()
-                        manager.executePendingTransactions()
+                        sortedMatchByRound.onEach { entry ->
+                            entry.value.sortedBy { node -> node!!.identifier }
+                            if (entry.key!! > 0) {
+                                sortedMatchByRoundWinnerBracket[entry.key] = entry.value
+                            } else {
+                                sortedMatchByRoundLoserBracket[entry.key] = entry.value
+                            }
+
+                        }
+                        viewPagerAdapter= BracketPagerAdapter(supportFragmentManager,sortedMatchByRoundWinnerBracket,sortedMatchByRoundLoserBracket)
+                        view_pager.adapter=viewPagerAdapter
+                        tabs.setupWithViewPager(view_pager)
                     }
 
                 }

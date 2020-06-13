@@ -8,6 +8,7 @@ import com.apollographql.apollo.api.Input
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.PhaseGroupByPhaseIdQuery
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.R
 import com.jger.ui.adapter.PhaseGroupRecyclerAdapter
 import com.jger.util.ApolloUtil
@@ -23,7 +24,8 @@ class PhaseGroupActivity : AppCompatActivity() {
                 ApolloUtil.clientHeader)
             .enqueue(object : ApolloCall.Callback<PhaseGroupByPhaseIdQuery.Data>() {
                 override fun onFailure(e: ApolloException) {
-                    TODO("Not yet implemented")
+                    FirebaseCrashlytics.getInstance()
+                        .log("Problème dans la requète de recherche de phase group : ${e.message}")
                 }
 
                 override fun onResponse(response: Response<PhaseGroupByPhaseIdQuery.Data>) {

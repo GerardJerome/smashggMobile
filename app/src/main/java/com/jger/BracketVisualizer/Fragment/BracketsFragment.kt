@@ -8,7 +8,6 @@ import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import com.apollographql.apollo.ApolloCall
-import com.apollographql.apollo.api.Input
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.MatchByPhaseGroupIdQuery
@@ -23,7 +22,6 @@ import com.jger.R
 import com.jger.transferClass.Test
 import com.jger.util.ApolloUtil
 import kotlinx.android.synthetic.main.fragment_brackts.*
-import java.util.*
 import java.util.function.Consumer
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -31,17 +29,13 @@ import kotlin.collections.HashMap
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment(var sortedMatchByRound: SortedMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
+class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
     Fragment(), ViewPager.OnPageChangeListener {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
     private var sectionList: ArrayList<ColomnData>? = null
     private var mNextSelectedScreen = 0
     private val mCurrentPagerState = 0
-    private val sortedMatchByRoundWinnerBracket =
-        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
-    private val sortedMatchByRoundLoserBracket =
-        HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
     private var wait = false
     private var listIdTreated = ArrayList<String>()
 
@@ -51,17 +45,6 @@ class BracketsFragment(var sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
         @Nullable container: ViewGroup?,
         @Nullable savedInstanceState: Bundle?
     ): View {
-        sortedMatchByRound.onEach { entry ->
-            entry.value.sortedBy { node -> node!!.identifier }
-            if (entry.key!! > 0) {
-                sortedMatchByRoundWinnerBracket[entry.key] = entry.value
-            } else {
-                sortedMatchByRoundLoserBracket[entry.key] = entry.value
-            }
-
-        }
-
-
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
             containeurs
@@ -81,9 +64,9 @@ class BracketsFragment(var sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
 
     private fun setData() {
         sectionList = ArrayList<ColomnData>()
-        sortedMatchByRoundWinnerBracket.keys.forEach(Consumer {
+        sortedMatchByRound.keys.forEach(Consumer {
             var matchByPhase = ArrayList<MatchData>()
-            sortedMatchByRoundWinnerBracket[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
+            sortedMatchByRound[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
                 if (node!!.displayScore!!.compareTo("DQ") == 0) {
 
                     wait=true
@@ -155,7 +138,7 @@ class BracketsFragment(var sortedMatchByRound: SortedMap<Int?, List<MatchByPhase
                     }
                 }
             }
-            while (listIdTreated.size!= sortedMatchByRoundWinnerBracket[it]!!.size){
+            while (listIdTreated.size!= sortedMatchByRound[it]!!.size){
                 Thread.sleep(100)
             }
             val matchTrie = (matchByPhase.sortedWith(compareBy( {it.identifier.length},{it.identifier})))

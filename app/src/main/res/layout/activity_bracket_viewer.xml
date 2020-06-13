@@ -6,10 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".ui.BracketViewerActivity">
 
-    <FrameLayout
-        android:id="@+id/containeur"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabMode="scrollable"
+        app:tabGravity="fill"
+        android:rotation="90">
+
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </FrameLayout>
+        <androidx.viewpager.widget.PagerTabStrip
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </androidx.viewpager.widget.PagerTabStrip>
+
+
+
+    </androidx.viewpager.widget.ViewPager>
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

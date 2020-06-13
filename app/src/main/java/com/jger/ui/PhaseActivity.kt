@@ -8,6 +8,7 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.EventQueryForPhaseIdQuery
 import com.example.TempQuery
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.R
 import com.jger.ui.adapter.PhaseRecyclerAdapter
 import com.jger.util.ApolloUtil
@@ -21,7 +22,8 @@ class PhaseActivity : AppCompatActivity() {
             .query(EventQueryForPhaseIdQuery(intent.getStringExtra("eventSlug"))).requestHeaders(ApolloUtil.clientHeader)
             .enqueue(object : ApolloCall.Callback<EventQueryForPhaseIdQuery.Data>() {
                 override fun onFailure(e: ApolloException) {
-                    TODO("Not yet implemented")
+                    FirebaseCrashlytics.getInstance()
+                        .log("Problème dans la requète de recherche de phase : ${e.message}")
                 }
 
                 override fun onResponse(response: Response<EventQueryForPhaseIdQuery.Data>) {

@@ -15,6 +15,7 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.TempQuery
 import com.example.TournamentQuery
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.R
 import com.jger.transferClass.EventTransfer
 import com.jger.ui.ListEventActivity
@@ -63,7 +64,7 @@ class SearchViewCustomAdapter(val context : Context, var listTournament: List<Te
                 .requestHeaders(ApolloUtil.clientHeader)
                 .enqueue(object : ApolloCall.Callback<TournamentQuery.Data>() {
                     override fun onFailure(e: ApolloException) {
-                        Log.d("jerom", e.toString())
+                        FirebaseCrashlytics.getInstance().log("Problème lors de la requète de recherche de tournament (slug = ${listTournament!![position]!!.slug!!} : ${e.message}")
                     }
 
                     override fun onResponse(response: Response<TournamentQuery.Data>) {

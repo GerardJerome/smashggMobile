@@ -16,7 +16,9 @@ import com.jger.R
 import com.jger.transferClass.EventTransfer
 import com.jger.ui.adapter.SearchViewCustomAdapter
 import com.jger.util.ApolloUtil
+import com.jger.util.RequestCountUtil
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
     var adapter = SearchViewCustomAdapter(this, ArrayList())
@@ -26,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         TournamentRecyclerView.adapter = adapter
         TournamentRecyclerView.layoutManager = LinearLayoutManager(this)
+        fixedRateTimer("default",false,0L,60000){
+            RequestCountUtil.counter=0
+        }
         tournament_sView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 onQueryTextChange(query)
@@ -44,8 +49,7 @@ class MainActivity : AppCompatActivity() {
 
                             override fun onResponse(response: Response<TempQuery.Data>) {
                                 adapter.updateList(response.data!!.tournaments!!.nodes)
-
-
+                                RequestCountUtil.counter++
                             }
 
                         })

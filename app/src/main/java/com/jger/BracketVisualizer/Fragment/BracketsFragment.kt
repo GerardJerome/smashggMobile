@@ -1,17 +1,24 @@
 package com.jger.BracketVisualizer.Fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
+import com.apollographql.apollo.exception.ApolloHttpException
 import com.example.MatchByPhaseGroupIdQuery
 import com.example.SetResultForDQQuery
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.customviews.WrapContentHeightViewPager
 import com.jger.BracketVisualizer.model.ColomnData
@@ -20,7 +27,10 @@ import com.jger.BracketVisualizer.model.MatchData
 import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
 import com.jger.transferClass.Test
+import com.jger.ui.BracketViewerActivity
 import com.jger.util.ApolloUtil
+import com.jger.util.RequestCountUtil
+import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 import kotlinx.android.synthetic.main.fragment_brackts.*
 import java.util.function.Consumer
 import kotlin.collections.ArrayList
@@ -48,7 +58,15 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
             containeurs
+        RequestCountUtil.tooMany.observe(viewLifecycleOwner , Observer {
+            if(it){
+                activity!!.findViewById<TextView>(R.id.chargement_textview).text="jeanjean"
+            }
+            if(RequestCountUtil.tooMany.value!!) {
+                RequestCountUtil.tooMany.postValue(false)
+            }
 
+        })
 
         return view
     }
@@ -69,14 +87,25 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
             sortedMatchByRound[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
                 if (node!!.displayScore!!.compareTo("DQ") == 0) {
 
-                    wait=true
+                    wait = true
                     ApolloUtil.apolloClient
-                        .query(SetResultForDQQuery(node!!.id!!))
+                        .query(SetResultForDQQuery(node.id!!))
                         .requestHeaders(
                             ApolloUtil.clientHeader
                         ).enqueue(object : ApolloCall.Callback<SetResultForDQQuery.Data>() {
                             override fun onFailure(e: ApolloException) {
-                                TODO("Not yet implemented")
+                                if ((e as ApolloHttpException).code() == 429) {
+                                    activity!!.runOnUiThread {
+                                        Log.d("jeromgerar","prout")
+                                        (activity!! as BracketViewerActivity).chargementTextview.text="prout"
+                                        RequestCountUtil.tooMany.postValue(true)
+                                    }
+                                }else{
+                                    activity!!.run {
+                                        Toast.makeText(activity!!,"PROUT",Toast.LENGTH_LONG).show()
+                                        e.printStackTrace()
+                                    }
+                                }
                             }
 
                             override fun onResponse(response: Response<SetResultForDQQuery.Data>) {
@@ -111,7 +140,7 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
                                     listIdTreated.add(node!!.id!!)
                                     matchByPhase.add(matchData)
                                 }
-                                wait=false
+                                wait = false
                             }
 
                         })
@@ -138,10 +167,11 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
                     }
                 }
             }
-            while (listIdTreated.size!= sortedMatchByRound[it]!!.size){
+            while (listIdTreated.size != sortedMatchByRound[it]!!.size) {
                 Thread.sleep(100)
             }
-            val matchTrie = (matchByPhase.sortedWith(compareBy( {it.identifier.length},{it.identifier})))
+            val matchTrie =
+                (matchByPhase.sortedWith(compareBy({ it.identifier.length }, { it.identifier })))
             sectionList!!.add(ColomnData(ArrayList(matchTrie)))
             listIdTreated.clear()
         })
@@ -244,4 +274,6 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
         }
         return bracktsFrgmnt
     }
+
+
 }

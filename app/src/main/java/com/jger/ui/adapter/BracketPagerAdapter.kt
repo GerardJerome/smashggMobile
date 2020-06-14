@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.MatchByPhaseGroupIdQuery
 import com.jger.BracketVisualizer.Fragment.BracketsFragment
+import com.jger.R
 
 class BracketPagerAdapter(
     fm: FragmentManager,
@@ -20,12 +21,19 @@ class BracketPagerAdapter(
     }
 
     override fun getCount(): Int {
-        return 2
+        if(sortedMatchByRoundLoserBracket.size>1){
+            return 2
+        }
+        return 1
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
         when(position){
-            0 -> return "Winner Bracket"
+            0 -> return if(count==1){
+                "Bracket"
+            } else{
+                "Winner Bracket"
+            }
             1 -> return "Loser Bracket"
         }
         return null

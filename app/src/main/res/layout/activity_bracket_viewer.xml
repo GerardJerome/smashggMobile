@@ -6,28 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".ui.BracketViewerActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
+
+    <TextView
+        android:id="@+id/chargement_textview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        >
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Création du Bracket en cours" />
 
-
-    </com.google.android.material.tabs.TabLayout>
-
-    <androidx.viewpager.widget.ViewPager
+    <com.jger.ui.view.VerticalViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         >
 
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            >
 
 
-    </androidx.viewpager.widget.ViewPager>
+        </com.google.android.material.tabs.TabLayout>
+
+
+    </com.jger.ui.view.VerticalViewPager>
 
 
 

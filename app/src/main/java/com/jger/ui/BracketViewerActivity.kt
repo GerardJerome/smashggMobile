@@ -1,6 +1,8 @@
 package com.jger.ui
 
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -13,18 +15,18 @@ import com.jger.BracketVisualizer.Fragment.BracketsFragment
 import com.jger.R
 import com.jger.ui.adapter.BracketPagerAdapter
 import com.jger.util.ApolloUtil
+import com.jger.util.RequestCountUtil
 import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 
-class BracketViewerActivity : AppCompatActivity() {
+class BracketViewerActivity() : AppCompatActivity() {
+    lateinit var chargementTextview:TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bracket_viewer)
         initialiseBracketsFragment()
-
+        chargementTextview=chargement_textview
     }
 
-    private var bracketWinnerFragment: BracketsFragment? = null
-    private var bracketLoserFragment : BracketsFragment? = null
     lateinit var viewPagerAdapter : BracketPagerAdapter
     private val sortedMatchByRoundWinnerBracket =
         HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>()
@@ -33,6 +35,7 @@ class BracketViewerActivity : AppCompatActivity() {
 
 
     private fun initialiseBracketsFragment() {
+        chargement_textview.visibility=View.VISIBLE
         ApolloUtil.apolloClient
             .query(MatchByPhaseGroupIdQuery(Input.fromNullable(intent.getStringExtra("phaseGroupId"))))
             .requestHeaders(
@@ -44,6 +47,7 @@ class BracketViewerActivity : AppCompatActivity() {
                 }
 
                 override fun onResponse(response: Response<MatchByPhaseGroupIdQuery.Data>) {
+                    RequestCountUtil.counter++
                     val listSet = response.data!!.phaseGroup!!.sets!!.nodes
                     val matchByRound =
                         listSet!!.groupBy { node: MatchByPhaseGroupIdQuery.Node? -> node!!.round } as HashMap
@@ -65,6 +69,7 @@ class BracketViewerActivity : AppCompatActivity() {
                         viewPagerAdapter= BracketPagerAdapter(supportFragmentManager,sortedMatchByRoundWinnerBracket,sortedMatchByRoundLoserBracket)
                         view_pager.adapter=viewPagerAdapter
                         tabs.setupWithViewPager(view_pager)
+                        this@BracketViewerActivity.findViewById<TextView>(R.id.chargement_textview).visibility=View.GONE
                     }
 
                 }
@@ -73,4 +78,6 @@ class BracketViewerActivity : AppCompatActivity() {
 
 
     }
+
+    
 }

@@ -1,5 +1,6 @@
 package com.jger.BracketVisualizer.Fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,6 +29,7 @@ import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
 import com.jger.transferClass.Test
 import com.jger.ui.BracketViewerActivity
+import com.jger.ui.MainActivity
 import com.jger.util.ApolloUtil
 import com.jger.util.RequestCountUtil
 import kotlinx.android.synthetic.main.activity_bracket_viewer.*
@@ -58,16 +60,6 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
             containeurs
-        RequestCountUtil.tooMany.observe(viewLifecycleOwner , Observer {
-            if(it){
-                activity!!.findViewById<TextView>(R.id.chargement_textview).text="jeanjean"
-            }
-            if(RequestCountUtil.tooMany.value!!) {
-                RequestCountUtil.tooMany.postValue(false)
-            }
-
-        })
-
         return view
     }
 
@@ -80,95 +72,27 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     }
 
 
+
     private fun setData() {
         sectionList = ArrayList<ColomnData>()
         sortedMatchByRound.keys.forEach(Consumer {
             var matchByPhase = ArrayList<MatchData>()
             sortedMatchByRound[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
-                if (node!!.displayScore!!.compareTo("DQ") == 0) {
-
-                    wait = true
-                    ApolloUtil.apolloClient
-                        .query(SetResultForDQQuery(node.id!!))
-                        .requestHeaders(
-                            ApolloUtil.clientHeader
-                        ).enqueue(object : ApolloCall.Callback<SetResultForDQQuery.Data>() {
-                            override fun onFailure(e: ApolloException) {
-                                if ((e as ApolloHttpException).code() == 429) {
-                                    activity!!.runOnUiThread {
-                                        Log.d("jeromgerar","prout")
-                                        (activity!! as BracketViewerActivity).chargementTextview.text="prout"
-                                        RequestCountUtil.tooMany.postValue(true)
-                                    }
-                                }else{
-                                    activity!!.run {
-                                        Toast.makeText(activity!!,"PROUT",Toast.LENGTH_LONG).show()
-                                        e.printStackTrace()
-                                    }
-                                }
-                            }
-
-                            override fun onResponse(response: Response<SetResultForDQQuery.Data>) {
-                                if (response.data!!.set!!.slots!![0]!!.standing!!.stats!!.score!!.value == ((-1).toDouble())) {
-                                    var matchData = MatchData(
-                                        CompetitorData(
-                                            response.data!!.set!!.slots!![0]!!.standing!!.entrant!!.name,
-                                            "DQ"
-                                        ),
-                                        CompetitorData(
-                                            response.data!!.set!!.slots!![1]!!.standing!!.entrant!!.name,
-                                            "Win"
-                                        ),
-                                        response.data!!.set!!.identifier
-
-
-                                    )
-                                    listIdTreated.add(node!!.id!!)
-                                    matchByPhase.add(matchData)
-                                } else if (response.data!!.set!!.slots!![1]!!.standing!!.stats!!.score!!.value == ((-1).toDouble())) {
-                                    var matchData = MatchData(
-                                        CompetitorData(
-                                            response.data!!.set!!.slots!![1]!!.standing!!.entrant!!.name,
-                                            "DQ"
-                                        ),
-                                        CompetitorData(
-                                            response.data!!.set!!.slots!![0]!!.standing!!.entrant!!.name,
-                                            "Win"
-                                        ),
-                                        response.data!!.set!!.identifier
-                                    )
-                                    listIdTreated.add(node!!.id!!)
-                                    matchByPhase.add(matchData)
-                                }
-                                wait = false
-                            }
-
-                        })
-                } else {
-                    val matchScoreArray = node!!.displayScore!!.split("-")
-                    if (matchScoreArray.size > 1) {
-                        val regex =
-                            "([[:ascii:]|\\p{L}]+)(\\d)+?\\s-\\s([[:ascii:]|\\p{L}]+)(\\d)".toRegex()
-                        val test = regex.find(node!!.displayScore!!, 0)
-                        val groupValue = test!!.groupValues
                         var matchData = MatchData(
                             CompetitorData(
-                                groupValue[1].trim(),
-                                groupValue[2].trim()
+                                node!!.slots!![0]!!.standing!!.entrant!!.name,
+                                node!!.slots!![0]!!.standing!!.stats!!.score!!.value!!.toInt().toString().replace("-1.0","DQ")
                             ),
                             CompetitorData(
-                                groupValue[3].trim(),
-                                groupValue[4].trim()
+                                node!!.slots!![1]!!.standing!!.entrant!!.name,
+                                node!!.slots!![1]!!.standing!!.stats!!.score!!.value!!.toInt().toString().replace("-1.0","DQ")
                             ),
                             node!!.identifier
                         )
                         listIdTreated.add(node!!.id!!)
                         matchByPhase.add(matchData)
-                    }
-                }
-            }
-            while (listIdTreated.size != sortedMatchByRound[it]!!.size) {
-                Thread.sleep(100)
+
+
             }
             val matchTrie =
                 (matchByPhase.sortedWith(compareBy({ it.identifier.length }, { it.identifier })))
@@ -176,6 +100,8 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
             listIdTreated.clear()
         })
     }
+
+
 
     private fun intialiseViewPagerAdapter() {
         Test.listParticipant.clear()

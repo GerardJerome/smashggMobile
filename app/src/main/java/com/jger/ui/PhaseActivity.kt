@@ -42,14 +42,22 @@ class PhaseActivity : AppCompatActivity() {
                 }
 
                 override fun onResponse(response: Response<EventQueryForPhaseIdQuery.Data>) {
-                    val adapter : PhaseRecyclerAdapter = PhaseRecyclerAdapter(response.data!!.event!!.phases!!)
-                    this@PhaseActivity.runOnUiThread(Runnable {
-                        phaseRecyclerView.adapter=adapter
-                        phaseRecyclerView.layoutManager = LinearLayoutManager(this@PhaseActivity)
-                    })
+                    if (response.data!!.event!!.phases != null) {
+                        val adapter: PhaseRecyclerAdapter =
+                            PhaseRecyclerAdapter(response.data!!.event!!.phases!!)
+                        this@PhaseActivity.runOnUiThread(Runnable {
+                            phaseRecyclerView.adapter = adapter
+                            phaseRecyclerView.layoutManager =
+                                LinearLayoutManager(this@PhaseActivity)
+                        })
 
+                    }else{
+                        this@PhaseActivity.runOnUiThread{
+                            Toast.makeText(this@PhaseActivity,"Aucune phase dans cet Event",Toast.LENGTH_LONG).show()
+                            this@PhaseActivity.finish()
+                        }
+                    }
                 }
-
             })
     }
 }

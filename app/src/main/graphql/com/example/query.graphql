@@ -24,6 +24,11 @@ query eventQueryForPhaseId($slug : String!){
     event(slug : $slug){
         id
         name
+        entrants{
+            nodes{
+                name
+            }
+        }
         phases{
             id
             name
@@ -60,18 +65,51 @@ query phaseGroupByPhaseId($id : ID){
     }
 }
 
-query matchByPhaseGroupId($id : ID){
+query matchByPhaseGroupId(
+    $id: ID!,
+    $page: Int!,
+    $perPage: Int!
+) {
     phaseGroup(id : $id){
-        sets(perPage:999){
-            nodes{
-                id
-                identifier
-                displayScore
-                round
+        sets(
+            page: $page,
+            perPage: $perPage,
+            sortType: CALL_ORDER
+        ) {
+            pageInfo {
+                total,
+                totalPages,
+                page,
+                perPage,
+                sortBy,
+                filter
+            },
+            nodes {
+                id,
+                identifier,
+                round,
+                slots {
+                    id,
+                    standing {
+                        id,
+                        entrant {
+                            id,
+                            name
+                        },
+                        placement,
+                        stats {
+                            score {
+                                label,
+                                value
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
 
 query SetResultForDQ($setId: ID!) {
     set(id: $setId) {

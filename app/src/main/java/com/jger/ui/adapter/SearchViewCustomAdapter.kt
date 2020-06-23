@@ -53,8 +53,10 @@ class SearchViewCustomAdapter(val context : Context, var listTournament: List<Te
         holder.itemView.findViewById<TextView>(R.id.tournament_name_txt).text= listTournament!![position]!!.name
         holder.itemView.findViewById<TextView>(R.id.contact_txt).text = listTournament!![position]!!.primaryContact
         if(listTournament!![position]!!.images!!.isNotEmpty()) {
-            Picasso.get().load(listTournament!![position]!!.images!![0]!!.url).resize(200, 400)
+            Picasso.get().load(listTournament!![position]!!.images!![0]!!.url).fit()
                 .into(holder.itemView.findViewById<ImageView>(R.id.tournament_image))
+
+            //resize(300, 400)
         }
         holder.itemView.setOnClickListener{
             ApolloUtil.apolloClient

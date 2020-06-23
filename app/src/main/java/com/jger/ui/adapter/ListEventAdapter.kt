@@ -40,7 +40,7 @@ class ListEventAdapter(val listEvents: List<TournamentQuery.Event?>?) : Recycler
         val date = Date(Integer.parseInt(listEvents!![position]!!.startAt.toString())*1000L)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
         holder.itemView.findViewById<TextView>(R.id.start_at_txt).text = dateFormat.format(date)
-        Picasso.get().load(listEvents!![position]!!.videogame!!.images!![0]!!.url).resize(200,400)
+        Picasso.get().load(listEvents!![position]!!.videogame!!.images!![0]!!.url).fit()
             .into(holder.itemView.findViewById<ImageView>(R.id.game_image))
         holder.itemView.setOnClickListener { v ->
             run {

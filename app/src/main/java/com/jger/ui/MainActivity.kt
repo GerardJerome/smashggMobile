@@ -1,9 +1,12 @@
 package com.jger.ui
 
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.apollographql.apollo.ApolloCall
@@ -31,7 +34,16 @@ class MainActivity : AppCompatActivity() {
         fixedRateTimer("default",false,0L,60000){
             RequestCountUtil.counter=0
         }
-        tournament_sView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_search,menu)
+
+        val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchItem = menu?.findItem(R.id.search)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 onQueryTextChange(query)
                 return true
@@ -58,5 +70,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+        return super.onCreateOptionsMenu(menu)
     }
 }

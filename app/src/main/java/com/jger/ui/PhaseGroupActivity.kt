@@ -18,6 +18,7 @@ class PhaseGroupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_phase_group)
+        supportActionBar!!.title = intent.getStringExtra("phaseGroupName");
 
         ApolloUtil.apolloClient
             .query(PhaseGroupByPhaseIdQuery(Input.fromNullable(intent.getStringExtra("phaseId")))).requestHeaders(

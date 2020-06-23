@@ -71,7 +71,7 @@ class SearchViewCustomAdapter(val context : Context, var listTournament: List<Te
 
                     override fun onResponse(response: Response<TournamentQuery.Data>) {
                         EventTransfer.listEvents=response.data!!.tournament!!.events!!
-                        it.context.startActivity(Intent(it.context,ListEventActivity::class.java))
+                        it.context.startActivity(Intent(it.context,ListEventActivity::class.java).putExtra("tournamentName",response.data!!.tournament!!.name))
                     }
 
                 })

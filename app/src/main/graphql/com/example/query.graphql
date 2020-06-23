@@ -36,6 +36,7 @@ query eventQueryForPhaseId($slug : String!){
             phaseGroups{
                 nodes{
                     id
+                    displayIdentifier
                 }
             }
         }

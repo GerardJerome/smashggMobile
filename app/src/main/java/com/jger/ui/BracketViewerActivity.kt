@@ -20,20 +20,24 @@ import com.jger.util.ApolloUtil
 import com.jger.util.RequestCountUtil
 import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 
-class BracketViewerActivity() : AppCompatActivity() {
+class BracketViewerActivity(var requestEnd:Boolean) : AppCompatActivity() {
+    init {
+        requestEnd=false
+    }
+
+    constructor() : this(false) {
+
+    }
     lateinit var chargementTextview: TextView
-    var requestEnd = false
     var page = 1
     var perPage = 55
     var listMatch = ArrayList<MatchByPhaseGroupIdQuery.Node?>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestEnd=false
         setContentView(R.layout.activity_bracket_viewer)
         initialiseBracketsFragment()
         chargementTextview = chargement_textview
-        RequestCountUtil.tooMany.observe(this, Observer {
-            Log.d("tooMany", it.toString())
-        })
     }
 
     lateinit var viewPagerAdapter: BracketPagerAdapter

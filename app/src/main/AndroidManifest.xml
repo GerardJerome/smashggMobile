@@ -13,11 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.PhaseGroupActivity"></activity>
-        <activity android:name=".ui.PhaseActivity" />
-        <activity android:name=".ui.BracketViewerActivity" />
-        <activity android:name=".ui.ListEventActivity" />
-        <activity android:name=".ui.MainActivity">
+        <activity
+            android:name=".ui.PhaseGroupActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ui.PhaseActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.BracketViewerActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.ListEventActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

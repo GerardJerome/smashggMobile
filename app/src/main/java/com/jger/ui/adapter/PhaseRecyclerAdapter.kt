@@ -38,10 +38,10 @@ class PhaseRecyclerAdapter(val listPhase : List<EventQueryForPhaseIdQuery.Phase?
         holder.itemView.setOnClickListener { view ->
             run {
                 if(listPhase[position]!!.groupCount!! >1){
-                    view.context.startActivity(Intent(view.context,PhaseGroupActivity::class.java).putExtra("phaseId",listPhase[position]!!.id))
+                    view.context.startActivity(Intent(view.context,PhaseGroupActivity::class.java).putExtra("phaseId",listPhase[position]!!.id).putExtra("phaseGroupName",listPhase[position]!!.phaseGroups!!.nodes!![0]!!.displayIdentifier))
                 }else{
                     view.context.startActivity(Intent(view.context,BracketViewerActivity::class.java).putExtra("phaseGroupId",
-                        listPhase[position]!!.phaseGroups!!.nodes!![0]!!.id))
+                        listPhase[position]!!.phaseGroups!!.nodes!![0]!!.id).putExtra("phaseGroupName",listPhase[position]!!.phaseGroups!!.nodes!![0]!!.displayIdentifier))
 
                 }
             }

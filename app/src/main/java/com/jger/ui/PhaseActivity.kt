@@ -21,6 +21,7 @@ class PhaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_phase)
+        supportActionBar?.title = intent.getStringExtra("eventName");
         FirebaseApp.initializeApp(this)
         ApolloUtil.apolloClient
             .query(EventQueryForPhaseIdQuery(intent.getStringExtra("eventSlug"))).requestHeaders(ApolloUtil.clientHeader)

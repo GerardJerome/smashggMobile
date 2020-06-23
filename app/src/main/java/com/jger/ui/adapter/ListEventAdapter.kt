@@ -44,7 +44,7 @@ class ListEventAdapter(val listEvents: List<TournamentQuery.Event?>?) : Recycler
             .into(holder.itemView.findViewById<ImageView>(R.id.game_image))
         holder.itemView.setOnClickListener { v ->
             run {
-                holder.itemView.context.startActivity(Intent(holder.itemView.context,PhaseActivity::class.java).putExtra("eventSlug",listEvents!![position]!!.slug))
+                holder.itemView.context.startActivity(Intent(holder.itemView.context,PhaseActivity::class.java).putExtra("eventSlug",listEvents!![position]!!.slug).putExtra("eventName",listEvents!![position]!!.name))
             }
         }
     }

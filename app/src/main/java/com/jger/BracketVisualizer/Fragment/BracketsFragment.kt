@@ -48,7 +48,7 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     private var sectionList: ArrayList<ColomnData>? = null
     private var mNextSelectedScreen = 0
     private val mCurrentPagerState = 0
-    private var wait = false
+    private var alreadyClose = false
     private var listIdTreated = ArrayList<String>()
 
     @Nullable
@@ -72,27 +72,37 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     }
 
 
-
     private fun setData() {
         sectionList = ArrayList<ColomnData>()
         sortedMatchByRound.keys.forEach(Consumer {
             var matchByPhase = ArrayList<MatchData>()
-            sortedMatchByRound[it]!!.forEach { node: MatchByPhaseGroupIdQuery.Node? ->
-                        var matchData = MatchData(
-                            CompetitorData(
-                                node!!.slots!![0]!!.standing!!.entrant!!.name,
-                                node!!.slots!![0]!!.standing!!.stats!!.score!!.value!!.toInt().toString().replace("-1.0","DQ")
-                            ),
-                            CompetitorData(
-                                node!!.slots!![1]!!.standing!!.entrant!!.name,
-                                node!!.slots!![1]!!.standing!!.stats!!.score!!.value!!.toInt().toString().replace("-1.0","DQ")
-                            ),
-                            node!!.identifier
-                        )
-                        listIdTreated.add(node!!.id!!)
-                        matchByPhase.add(matchData)
+            try {
+                sortedMatchByRound[it]!!.forEach label@{ node: MatchByPhaseGroupIdQuery.Node? ->
+                    var matchData = MatchData(
+                        CompetitorData(
+                            node!!.slots!![0]!!.standing!!.entrant!!.name,
+                            node!!.slots!![0]!!.standing!!.stats!!.score!!.value!!.toInt()
+                                .toString().replace("-1.0", "DQ")
+                        ),
+                        CompetitorData(
+                            node!!.slots!![1]!!.standing!!.entrant!!.name,
+                            node!!.slots!![1]!!.standing!!.stats!!.score!!.value!!.toInt()
+                                .toString().replace("-1.0", "DQ")
+                        ),
+                        node!!.identifier
+                    )
+                    listIdTreated.add(node!!.id!!)
+                    matchByPhase.add(matchData)
 
-
+                }
+            } catch (e: Exception) {
+                (activity as BracketViewerActivity)!!.requestEnd = true
+                activity!!.finish()
+                Toast.makeText(
+                    activity,
+                    "Le bracket n'est pas encore disponible",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             val matchTrie =
                 (matchByPhase.sortedWith(compareBy({ it.identifier.length }, { it.identifier })))
@@ -100,7 +110,6 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
             listIdTreated.clear()
         })
     }
-
 
 
     private fun intialiseViewPagerAdapter() {

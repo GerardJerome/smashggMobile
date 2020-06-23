@@ -7,11 +7,19 @@
     android:background="@color/backgroundApp"
     tools:context=".ui.MainActivity">
 
+    <TextView
+        android:id="@+id/acceuilText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Veuillez saisir le nom du tournois"
+        android:gravity="center"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/TournamentRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

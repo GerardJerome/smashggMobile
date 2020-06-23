@@ -13,6 +13,7 @@ class ListEventActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lis_event)
+        supportActionBar!!.title = intent.getStringExtra("tournamentName");
         val adapter = ListEventAdapter(EventTransfer.listEvents)
         EventRecyclerView.adapter=adapter
         EventRecyclerView.layoutManager=LinearLayoutManager(this)

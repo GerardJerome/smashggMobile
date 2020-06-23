@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.apollographql.apollo.ApolloCall
@@ -20,6 +21,7 @@ import com.jger.transferClass.EventTransfer
 import com.jger.ui.adapter.SearchViewCustomAdapter
 import com.jger.util.ApolloUtil
 import com.jger.util.RequestCountUtil
+import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.concurrent.fixedRateTimer
 
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                acceuilText.visibility=View.GONE
                 if (newText!!.length > 2) {
                     ApolloUtil.apolloClient
                         .query(TempQuery(newText)).requestHeaders(ApolloUtil.clientHeader)
@@ -60,8 +63,8 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             override fun onResponse(response: Response<TempQuery.Data>) {
-                                adapter.updateList(response.data!!.tournaments!!.nodes)
-                                RequestCountUtil.counter++
+                                    adapter.updateList(response.data!!.tournaments!!.nodes)
+                                    RequestCountUtil.counter++
                             }
 
                         })

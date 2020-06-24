@@ -1,7 +1,10 @@
 package com.jger.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.api.Input
@@ -21,8 +24,10 @@ class PhaseGroupActivity : AppCompatActivity() {
         supportActionBar!!.title = intent.getStringExtra("phaseGroupName");
 
         ApolloUtil.apolloClient
-            .query(PhaseGroupByPhaseIdQuery(Input.fromNullable(intent.getStringExtra("phaseId")))).requestHeaders(
-                ApolloUtil.clientHeader)
+            .query(PhaseGroupByPhaseIdQuery(Input.fromNullable(intent.getStringExtra("phaseId"))))
+            .requestHeaders(
+                ApolloUtil.clientHeader
+            )
             .enqueue(object : ApolloCall.Callback<PhaseGroupByPhaseIdQuery.Data>() {
                 override fun onFailure(e: ApolloException) {
                     FirebaseCrashlytics.getInstance()
@@ -30,13 +35,33 @@ class PhaseGroupActivity : AppCompatActivity() {
                 }
 
                 override fun onResponse(response: Response<PhaseGroupByPhaseIdQuery.Data>) {
-                    val adapter = PhaseGroupRecyclerAdapter(response.data!!.phase!!.phaseGroups!!.nodes)
+                    val adapter =
+                        PhaseGroupRecyclerAdapter(response.data!!.phase!!.phaseGroups!!.nodes)
                     this@PhaseGroupActivity.runOnUiThread {
-                        phaseGroupRecyclerView.adapter=adapter
-                        phaseGroupRecyclerView.layoutManager=LinearLayoutManager(this@PhaseGroupActivity)
+                        phaseGroupRecyclerView.adapter = adapter
+                        phaseGroupRecyclerView.layoutManager =
+                            LinearLayoutManager(this@PhaseGroupActivity)
                     }
                 }
 
             })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search, menu)
+        menu!!.findItem(R.id.search).isVisible = false
+        menu!!.findItem(R.id.search).isEnabled = false
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.homeButton -> {
+                var homeIntent = Intent(this, MainActivity::class.java)
+                homeIntent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(homeIntent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

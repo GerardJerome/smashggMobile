@@ -1,23 +1,19 @@
 package com.jger.ui
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import com.apollographql.apollo.ApolloCall
-import com.apollographql.apollo.api.Input
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.MatchByPhaseGroupIdQuery
-import com.jger.BracketVisualizer.Fragment.BracketsFragment
 import com.jger.R
 import com.jger.ui.adapter.BracketPagerAdapter
 import com.jger.util.ApolloUtil
-import com.jger.util.RequestCountUtil
 import kotlinx.android.synthetic.main.activity_bracket_viewer.*
 
 class BracketViewerActivity(var requestEnd:Boolean) : AppCompatActivity() {
@@ -84,6 +80,24 @@ class BracketViewerActivity(var requestEnd:Boolean) : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search,menu)
+        menu!!.findItem(R.id.search).isVisible = false
+        menu!!.findItem(R.id.search).isEnabled=false
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.homeButton -> {
+                var homeIntent = Intent(this, MainActivity::class.java)
+                homeIntent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(homeIntent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun requestMatch() {

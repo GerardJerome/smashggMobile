@@ -1,14 +1,18 @@
 package com.jger.BracketVisualizer.Fragment
 
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.os.Bundle
+import android.provider.BaseColumns
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.annotation.Nullable
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
@@ -20,6 +24,7 @@ import com.example.MatchByPhaseGroupIdQuery
 import com.example.SetResultForDQQuery
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.internal.common.CommonUtils
 import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.customviews.WrapContentHeightViewPager
 import com.jger.BracketVisualizer.model.ColomnData
@@ -57,6 +62,7 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
         @Nullable container: ViewGroup?,
         @Nullable savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         val view = inflater.inflate(R.layout.fragment_brackts, container, false)
         viewPager =
             containeurs
@@ -72,11 +78,68 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     }
 
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.findItem(R.id.search).isVisible = false
+        menu.findItem(R.id.search).isEnabled = false
+        val searchManager = activity!!.getSystemService(Context.SEARCH_SERVICE)
+        val searchView =
+            (menu.findItem(R.id.gamertagField).actionView as androidx.appcompat.widget.SearchView)
+        val columnList = arrayOf("_id", "gamertag")
+        val temp = Array<String>(2) { "" }
+        var index = 0
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = IntArray(1) { R.id.item_label }
+        val adapter = androidx.cursoradapter.widget.SimpleCursorAdapter(
+            activity,
+            R.layout.suggestion_layout,
+            null,
+            from,
+            to,
+            CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
+        )
+        searchView.suggestionsAdapter = adapter
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(gamertag: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onQueryTextChange(pattern: String?): Boolean {
+                val cursor =
+                    MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                pattern.let {
+                    Test.listParticipant.forEachIndexed { index, suggestion ->
+                        if(suggestion.contains(it!!,true)){
+                            cursor.addRow(arrayOf(index,suggestion))
+                        }
+                    }
+                }
+                adapter.changeCursor(cursor)
+                return true
+            }
+
+        })
+        searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener{
+            override fun onSuggestionSelect(position: Int): Boolean {
+                return false
+            }
+
+            override fun onSuggestionClick(position: Int): Boolean {
+                val cursor = searchView.suggestionsAdapter.getItem(position) as Cursor
+                val selection = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+                searchView.setQuery(selection, false)
+                CommonUtils.hideKeyboard(activity,view)
+                return true
+            }
+
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     private fun setData() {
         sectionList = ArrayList<ColomnData>()
         sortedMatchByRound.keys.forEach(Consumer {
             var matchByPhase = ArrayList<MatchData>()
-            try {
+           // try {
                 sortedMatchByRound[it]!!.forEach label@{ node: MatchByPhaseGroupIdQuery.Node? ->
                     var matchData = MatchData(
                         CompetitorData(
@@ -95,15 +158,14 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
                     matchByPhase.add(matchData)
 
                 }
-            } catch (e: Exception) {
-                (activity as BracketViewerActivity)!!.requestEnd = true
+            /*} catch (e: Exception) {
                 activity!!.finish()
                 Toast.makeText(
                     activity,
                     "Le bracket n'est pas encore disponible",
                     Toast.LENGTH_LONG
                 ).show()
-            }
+            }*/
             val matchTrie =
                 (matchByPhase.sortedWith(compareBy({ it.identifier.length }, { it.identifier })))
             sectionList!!.add(ColomnData(ArrayList(matchTrie)))

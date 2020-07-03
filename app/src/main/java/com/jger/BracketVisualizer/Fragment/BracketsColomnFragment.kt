@@ -29,7 +29,7 @@ class BracketsColomnFragment : Fragment() {
     var previousBracketSize = 0
         private set
     private var list: ArrayList<MatchData> = ArrayList()
-    private var bracketsRV: RecyclerView? = null
+    var bracketsRV: RecyclerView? = null
     private var adapter: BracketsCellAdapter? = null
 
 

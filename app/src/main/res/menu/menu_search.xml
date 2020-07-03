@@ -11,6 +11,12 @@
     <item
         android:title="home"
         android:id="@+id/homeButton"
-        android:icon="@drawable/ic_action_home"
+        android:icon="@drawable/logo_blanc"
         app:showAsAction="always" />
+    <item
+        android:title="Gamertag"
+        android:id="@+id/gamertagField"
+        android:icon="@drawable/ic_action_person"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
 </menu>

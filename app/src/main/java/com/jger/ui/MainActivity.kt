@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
         inflater.inflate(R.menu.menu_search,menu)
         menu!!.findItem(R.id.homeButton).isEnabled=false
         menu.findItem(R.id.homeButton).isVisible=false
+        menu.findItem(R.id.gamertagField).isEnabled=false
+        menu.findItem(R.id.gamertagField).isVisible=false
         val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchItem = menu?.findItem(R.id.search)
         val searchView = searchItem?.actionView as SearchView

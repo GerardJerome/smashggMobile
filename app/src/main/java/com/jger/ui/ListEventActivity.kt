@@ -26,6 +26,8 @@ class ListEventActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_search,menu)
         menu!!.findItem(R.id.search).isVisible = false
         menu!!.findItem(R.id.search).isEnabled=false
+        menu.findItem(R.id.gamertagField).isVisible=false
+        menu.findItem(R.id.gamertagField).isEnabled=false
         return super.onCreateOptionsMenu(menu)
     }
 

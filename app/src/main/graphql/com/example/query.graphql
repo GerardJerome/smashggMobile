@@ -91,6 +91,9 @@ query matchByPhaseGroupId(
                 round,
                 slots {
                     id,
+                    prereqId,
+                    prereqPlacement,
+                    prereqType,
                     standing {
                         id,
                         entrant {

@@ -22,7 +22,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsColomnFragment : Fragment() {
+class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
     private var colomnData: ColomnData? = null
     var sectionNumber = 0
         private set
@@ -31,6 +31,7 @@ class BracketsColomnFragment : Fragment() {
     private var list: ArrayList<MatchData> = ArrayList()
     var bracketsRV: RecyclerView? = null
     private var adapter: BracketsCellAdapter? = null
+    private var isLastSection =false
 
 
     @Nullable
@@ -66,6 +67,7 @@ class BracketsColomnFragment : Fragment() {
                 colomnData = getArguments()!!.getSerializable("colomn_data") as ColomnData
                 sectionNumber = getArguments()!!.getInt("section_number")
                 previousBracketSize = getArguments()!!.getInt("previous_section_size")
+                isLastSection = arguments!!.getBoolean("isLastSection")
                 list!!.addAll(colomnData!!.getMatches())
                 setInitialHeightForList()
             }
@@ -73,8 +75,11 @@ class BracketsColomnFragment : Fragment() {
 
     private fun setInitialHeightForList() {
         for (data in list!!) {
-            val newPlayer = Test.listParticipant.size>0 && !Test.listParticipant.contains(data.competitorOne.name) || !Test.listParticipant.contains(data.competitorTwo.name)
-            if(newPlayer){
+            val newPlayer = Test.listParticipant.size>0 && (!Test.listParticipant.contains(data.competitorOne.name) && data.competitorOne.name.compareTo("TBD")!=0)
+                    || (!Test.listParticipant.contains(data.competitorTwo.name) && data.competitorTwo.name.compareTo("TBD")!=0)
+                    || isLooser && (!data.competitorOne.isFromLooser || !data.competitorTwo.isFromLooser)
+
+            if(newPlayer || previousBracketSize< list.size || isLastSection){
                data.height=(BracketsUtility.dpToPx(131))
                 data.originalHeight=(BracketsUtility.dpToPx(131))
             }else if (sectionNumber == 0) {
@@ -91,7 +96,13 @@ class BracketsColomnFragment : Fragment() {
                 data.originalHeight=BracketsUtility.dpToPx(262)
             } else if (previousBracketSize == list!!.size && !newPlayer) {
                 data.setHeight(BracketsUtility.dpToPx(131))
-                data.originalHeight=BracketsUtility.dpToPx(131)
+                data.originalHeight = BracketsUtility.dpToPx(131)
+            }else{
+                data.height=BracketsUtility.dpToPx(262)
+
+            }
+            if(isLastSection){
+                data.height=BracketsUtility.dpToPx(262)
             }
             if(!Test.listParticipant.contains(data.competitorTwo.name)){
                 Test.listParticipant.add(data.competitorTwo.name)

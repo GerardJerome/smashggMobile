@@ -10,10 +10,20 @@ public class CompetitorData implements Serializable {
 
     private String name;
     private String score;
+    private boolean isFromLooser;
 
-    public CompetitorData(String name, String score){
+    public CompetitorData(String name, String score, Boolean isFromLooser) {
         this.name = name;
         this.score = score;
+        this.isFromLooser = isFromLooser;
+    }
+
+    public boolean isFromLooser() {
+        return isFromLooser;
+    }
+
+    public void setFromLooser(boolean fromLooser) {
+        isFromLooser = fromLooser;
     }
 
     public String getScore() {

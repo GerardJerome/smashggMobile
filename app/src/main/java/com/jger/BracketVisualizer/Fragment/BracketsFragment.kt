@@ -2,42 +2,25 @@ package com.jger.BracketVisualizer.Fragment
 
 import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.Nullable
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.viewpager.widget.ViewPager
-import com.apollographql.apollo.ApolloCall
-import com.apollographql.apollo.api.Response
-import com.apollographql.apollo.exception.ApolloException
-import com.apollographql.apollo.exception.ApolloHttpException
 import com.example.MatchByPhaseGroupIdQuery
-import com.example.SetResultForDQQuery
-import com.google.firebase.FirebaseApp
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.internal.common.CommonUtils
 import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.customviews.WrapContentHeightViewPager
 import com.jger.BracketVisualizer.model.ColomnData
 import com.jger.BracketVisualizer.model.CompetitorData
 import com.jger.BracketVisualizer.model.MatchData
-import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
 import com.jger.transferClass.Test
-import com.jger.ui.BracketViewerActivity
-import com.jger.ui.MainActivity
-import com.jger.util.ApolloUtil
-import com.jger.util.RequestCountUtil
-import kotlinx.android.synthetic.main.activity_bracket_viewer.*
+import com.jger.ui.adapter.BracketPagerAdapter
 import kotlinx.android.synthetic.main.fragment_brackts.*
 import java.util.function.Consumer
 import kotlin.collections.ArrayList
@@ -46,15 +29,19 @@ import kotlin.collections.HashMap
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>) :
-    Fragment(), ViewPager.OnPageChangeListener {
+class BracketsFragment(
+    var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGroupIdQuery.Node?>>,
+    val isLooser: Boolean,
+    val bracketPagerAdapter: BracketPagerAdapter
+) :
+    Fragment() {
     private var viewPager: WrapContentHeightViewPager? = null
     private var sectionAdapter: BracketsSectionAdapter? = null
     private var sectionList: ArrayList<ColomnData>? = null
     private var mNextSelectedScreen = 0
     private val mCurrentPagerState = 0
-    private var alreadyClose = false
     private var listIdTreated = ArrayList<String>()
+
 
     @Nullable
     override fun onCreateView(
@@ -81,12 +68,9 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.findItem(R.id.search).isVisible = false
         menu.findItem(R.id.search).isEnabled = false
-        val searchManager = activity!!.getSystemService(Context.SEARCH_SERVICE)
+        activity!!.getSystemService(Context.SEARCH_SERVICE)
         val searchView =
-            (menu.findItem(R.id.gamertagField).actionView as androidx.appcompat.widget.SearchView)
-        val columnList = arrayOf("_id", "gamertag")
-        val temp = Array<String>(2) { "" }
-        var index = 0
+            (menu.findItem(R.id.gamertagField).actionView as SearchView)
         val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
         val to = IntArray(1) { R.id.item_label }
         val adapter = androidx.cursoradapter.widget.SimpleCursorAdapter(
@@ -136,36 +120,54 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     }
 
     private fun setData() {
-        sectionList = ArrayList<ColomnData>()
+        sectionList = ArrayList()
         sortedMatchByRound.keys.forEach(Consumer {
-            var matchByPhase = ArrayList<MatchData>()
-           // try {
+            val matchByPhase = ArrayList<MatchData>()
+            var compet1 = CompetitorData("TBD","",false)
+            var compet2 = CompetitorData("TBD","",false)
                 sortedMatchByRound[it]!!.forEach label@{ node: MatchByPhaseGroupIdQuery.Node? ->
-                    var matchData = MatchData(
-                        CompetitorData(
-                            node!!.slots!![0]!!.standing!!.entrant!!.name,
-                            node!!.slots!![0]!!.standing!!.stats!!.score!!.value!!.toInt()
-                                .toString().replace("-1.0", "DQ")
-                        ),
-                        CompetitorData(
-                            node!!.slots!![1]!!.standing!!.entrant!!.name,
-                            node!!.slots!![1]!!.standing!!.stats!!.score!!.value!!.toInt()
-                                .toString().replace("-1.0", "DQ")
-                        ),
+                    compet1.isFromLooser=playerWillBeFromLoser(node!!.slots!![0]!!)
+                    compet2.isFromLooser=playerWillBeFromLoser(node!!.slots!![1])
+                    if(node?.slots?.get(0)?.standing?.entrant?.name != null){
+                        compet1 = if(node.slots[0]?.standing?.stats?.score?.value == null){
+                            CompetitorData(
+                                node.slots[0]!!.standing!!.entrant!!.name,
+                                "",
+                                playerWillBeFromLoser(node.slots[0])
+                            )
+                        }else {
+                            CompetitorData(
+                                node.slots[0]!!.standing!!.entrant!!.name,
+                                node.slots[0]!!.standing!!.stats!!.score!!.value!!.toInt()
+                                    .toString().replace("-1.0", "DQ").replace("-1", "DQ"),
+                                playerWillBeFromLoser(node.slots[0])
+                            )
+                        }
+                    }
+                    if(node?.slots?.get(1)?.standing?.entrant?.name != null){
+                        compet2 = if(node.slots[1]?.standing?.stats?.score?.value == null){
+                            CompetitorData(
+                                node.slots[1]!!.standing!!.entrant!!.name,
+                                "",
+                                playerWillBeFromLoser(node.slots[1])
+                            )
+                        }else {
+                            CompetitorData(
+                                node.slots[1]!!.standing!!.entrant!!.name,
+                                node.slots[1]!!.standing!!.stats!!.score!!.value!!.toInt()
+                                    .toString().replace("-1.0", "DQ").replace("-1", "DQ"),
+                                playerWillBeFromLoser(node.slots[1])
+                            )
+                        }
+                    }
+                    val matchData = MatchData(compet1
+                        ,compet2,
                         node!!.identifier
                     )
-                    listIdTreated.add(node!!.id!!)
+                    listIdTreated.add(node.id!!)
                     matchByPhase.add(matchData)
 
                 }
-            /*} catch (e: Exception) {
-                activity!!.finish()
-                Toast.makeText(
-                    activity,
-                    "Le bracket n'est pas encore disponible",
-                    Toast.LENGTH_LONG
-                ).show()
-            }*/
             val matchTrie =
                 (matchByPhase.sortedWith(compareBy({ it.identifier.length }, { it.identifier })))
             sectionList!!.add(ColomnData(ArrayList(matchTrie)))
@@ -173,17 +175,20 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
         })
     }
 
+    private fun playerWillBeFromLoser(slot: MatchByPhaseGroupIdQuery.Slot?): Boolean {
+        return slot!!.prereqPlacement == 1
+    }
+
 
     private fun intialiseViewPagerAdapter() {
         Test.listParticipant.clear()
-        sectionAdapter = BracketsSectionAdapter(childFragmentManager, sectionList!!)
+        sectionAdapter = BracketsSectionAdapter(childFragmentManager, sectionList!!,isLooser)
         viewPager!!.offscreenPageLimit = 10
         viewPager!!.adapter = sectionAdapter
         viewPager!!.currentItem = 0
         viewPager!!.pageMargin = -200
         viewPager!!.isHorizontalFadingEdgeEnabled = true
         viewPager!!.setFadingEdgeLength(50)
-        viewPager!!.addOnPageChangeListener(this)
     }
 
     private fun initViews() {
@@ -191,7 +196,7 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
     }
 
 
-    override fun onPageScrolled(
+   /* override fun onPageScrolled(
         position: Int,
         positionOffset: Float,
         positionOffsetPixels: Int
@@ -253,10 +258,8 @@ class BracketsFragment(var sortedMatchByRound: HashMap<Int?, List<MatchByPhaseGr
                 }
             }
         }
-    }
+    }*/
 
-    override fun onPageSelected(position: Int) {}
-    override fun onPageScrollStateChanged(state: Int) {}
     fun getBracketsFragment(position: Int): BracketsColomnFragment? {
         var bracktsFrgmnt: BracketsColomnFragment? = null
         val fragments: List<Fragment> =

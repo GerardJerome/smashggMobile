@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.MatchByPhaseGroupIdQuery
 import com.jger.BracketVisualizer.Fragment.BracketsFragment
-import com.jger.R
 
 class BracketPagerAdapter(
     fm: FragmentManager,
@@ -14,10 +13,10 @@ class BracketPagerAdapter(
 ) : FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment {
        when(position){
-            0 -> return BracketsFragment(sortedMatchByRoundWinnerBracket)
-            1 -> return BracketsFragment(sortedMatchByRoundLoserBracket)
+            0 -> return BracketsFragment(sortedMatchByRoundWinnerBracket,false,this)
+            1 -> return BracketsFragment(sortedMatchByRoundLoserBracket,true,this)
         }
-        return BracketsFragment(sortedMatchByRoundLoserBracket)
+        return BracketsFragment(sortedMatchByRoundLoserBracket,true,this)
     }
 
     override fun getCount(): Int {

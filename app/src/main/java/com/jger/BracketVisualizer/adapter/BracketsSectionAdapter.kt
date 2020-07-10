@@ -14,13 +14,14 @@ import java.util.*
  */
 class BracketsSectionAdapter(
     fm: FragmentManager,
-    sectionList: ArrayList<ColomnData>
+    sectionList: ArrayList<ColomnData>,
+    val isLooser : Boolean
 ) : FragmentStatePagerAdapter(fm) {
     private val sectionList: ArrayList<ColomnData>
     override fun getItem(position: Int): Fragment {
         val bundle = Bundle()
         bundle.putSerializable("colomn_data", sectionList[position])
-        val fragment = BracketsColomnFragment()
+        val fragment = BracketsColomnFragment(isLooser)
         bundle.putInt("section_number", position)
         if (position > 0) bundle.putInt(
             "previous_section_size",
@@ -29,6 +30,9 @@ class BracketsSectionAdapter(
             "previous_section_size",
             sectionList[position].getMatches().size
         )
+        if(sectionList.size-1 == position){
+            bundle.putBoolean("isLastSection",true)
+        }
         fragment.setArguments(bundle)
         return fragment
     }

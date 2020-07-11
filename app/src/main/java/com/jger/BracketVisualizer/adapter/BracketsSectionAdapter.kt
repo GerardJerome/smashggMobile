@@ -33,6 +33,9 @@ class BracketsSectionAdapter(
         if(sectionList.size-1 == position){
             bundle.putBoolean("isLastSection",true)
         }
+        if(sectionList.size-2 == position && !isLooser){
+            bundle.putBoolean("isWinnerFinnal",true)
+        }
         fragment.setArguments(bundle)
         return fragment
     }

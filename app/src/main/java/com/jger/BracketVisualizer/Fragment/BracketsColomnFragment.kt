@@ -32,6 +32,7 @@ class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
     var bracketsRV: RecyclerView? = null
     private var adapter: BracketsCellAdapter? = null
     private var isLastSection =false
+    private var isWinnerFinalSection = false
 
 
     @Nullable
@@ -68,6 +69,7 @@ class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
                 sectionNumber = getArguments()!!.getInt("section_number")
                 previousBracketSize = getArguments()!!.getInt("previous_section_size")
                 isLastSection = arguments!!.getBoolean("isLastSection")
+                isWinnerFinalSection = arguments!!.getBoolean("isWinnerFinnal")
                 list!!.addAll(colomnData!!.getMatches())
                 setInitialHeightForList()
             }
@@ -101,6 +103,10 @@ class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
                 data.height=BracketsUtility.dpToPx(262)
 
             }
+            if(isWinnerFinalSection){
+                data.height=BracketsUtility.dpToPx(131*(sectionNumber+1))
+            }
+
             if(isLastSection){
                 data.height=BracketsUtility.dpToPx(262)
             }

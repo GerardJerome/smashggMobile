@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.jger.BracketVisualizer.Fragment.BracketsColomnFragment
 import com.jger.BracketVisualizer.model.ColomnData
-import com.jger.transferClass.Test
 import java.util.*
 
 /**
@@ -14,14 +13,13 @@ import java.util.*
  */
 class BracketsSectionAdapter(
     fm: FragmentManager,
-    sectionList: ArrayList<ColomnData>,
+    val sectionList: ArrayList<ColomnData>,
     val isLooser : Boolean
 ) : FragmentStatePagerAdapter(fm) {
-    private val sectionList: ArrayList<ColomnData>
     override fun getItem(position: Int): Fragment {
         val bundle = Bundle()
         bundle.putSerializable("colomn_data", sectionList[position])
-        val fragment = BracketsColomnFragment(isLooser)
+        val fragment = BracketsColomnFragment(isLooser,this)
         bundle.putInt("section_number", position)
         if (position > 0) bundle.putInt(
             "previous_section_size",
@@ -30,6 +28,9 @@ class BracketsSectionAdapter(
             "previous_section_size",
             sectionList[position].getMatches().size
         )
+        if(position>0){
+            bundle.putSerializable("lastColomnData", sectionList[position-1])
+        }
         if(sectionList.size-1 == position){
             bundle.putBoolean("isLastSection",true)
         }
@@ -45,7 +46,4 @@ class BracketsSectionAdapter(
     }
 
 
-    init {
-        this.sectionList = sectionList
-    }
 }

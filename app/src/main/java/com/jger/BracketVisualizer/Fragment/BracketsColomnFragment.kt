@@ -10,19 +10,21 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jger.BracketVisualizer.adapter.BracketsCellAdapter
+import com.jger.BracketVisualizer.adapter.BracketsSectionAdapter
 import com.jger.BracketVisualizer.model.ColomnData
-import com.jger.BracketVisualizer.model.CompetitorData
 import com.jger.BracketVisualizer.model.MatchData
 import com.jger.BracketVisualizer.utility.BracketsUtility
 import com.jger.R
 import com.jger.transferClass.Test
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * Created by Emil on 21/10/17.
  */
-class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
+class BracketsColomnFragment(
+    val isLooser: Boolean,
+    val bracketsSectionAdapter: BracketsSectionAdapter
+) : Fragment() {
     private var colomnData: ColomnData? = null
     var sectionNumber = 0
         private set
@@ -33,6 +35,8 @@ class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
     private var adapter: BracketsCellAdapter? = null
     private var isLastSection =false
     private var isWinnerFinalSection = false
+    private var lastList : ArrayList<MatchData> = ArrayList()
+    private var lastColomnData : ColomnData? = null
 
 
     @Nullable
@@ -65,51 +69,68 @@ class BracketsColomnFragment(val isLooser : Boolean) : Fragment() {
         private get() {
             if (getArguments() != null) {
                 list = ArrayList<MatchData>()
+                lastColomnData = arguments!!.getSerializable("lastColomnData") as ColomnData?
                 colomnData = getArguments()!!.getSerializable("colomn_data") as ColomnData
                 sectionNumber = getArguments()!!.getInt("section_number")
                 previousBracketSize = getArguments()!!.getInt("previous_section_size")
                 isLastSection = arguments!!.getBoolean("isLastSection")
                 isWinnerFinalSection = arguments!!.getBoolean("isWinnerFinnal")
+                if(lastColomnData!=null) {
+                    lastList.addAll(lastColomnData!!.matches)
+                }
                 list!!.addAll(colomnData!!.getMatches())
                 setInitialHeightForList()
             }
         }
 
     private fun setInitialHeightForList() {
+        var indexToRefer = 0
         for (data in list!!) {
+            val playerFromLastMatch  = sectionNumber!=0 && lastList.size>list.indexOf(data) &&   (data.competitorOne.name.compareTo(lastList[list.indexOf(data)].competitorOne.name)==0
+                    || data.competitorOne.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0
+                    || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorOne.name)==0
+                    || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0)
             val newPlayer = Test.listParticipant.size>0 && (!Test.listParticipant.contains(data.competitorOne.name) && data.competitorOne.name.compareTo("TBD")!=0)
                     || (!Test.listParticipant.contains(data.competitorTwo.name) && data.competitorTwo.name.compareTo("TBD")!=0)
                     || isLooser && (!data.competitorOne.isFromLooser || !data.competitorTwo.isFromLooser)
+            if(sectionNumber==0){
+                    data.height = BracketsUtility.dpToPx(131)
+            }else if(!playerFromLastMatch ){
+                if(indexToRefer >= lastList.size){
+                    data.height = BracketsUtility.dpToPx(131)
+                }else {
+                    data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height)
+                }
+                indexToRefer+=2
+            }else if(playerFromLastMatch && sectionNumber!=0){
+                if(indexToRefer>= lastList.size){
+                    data.height = BracketsUtility.dpToPx(131)
+                }else {
+                    data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height + 131)
+                }
+                indexToRefer++
+            }
+            colomnData?.matches=list
+            bracketsSectionAdapter.sectionList[bracketsSectionAdapter.sectionList.indexOf(
+                lastColomnData
+            ) + 1] = colomnData!!
 
-            if(newPlayer || previousBracketSize< list.size || isLastSection){
-               data.height=(BracketsUtility.dpToPx(131))
-                data.originalHeight=(BracketsUtility.dpToPx(131))
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            /*if(newPlayer || previousBracketSize< list.size || isLastSection && sectionNumber!=0){
+               data.height=(BracketsUtility.dpToPx((sectionNumber) * 131))
             }else if (sectionNumber == 0) {
-                data.setHeight(BracketsUtility.dpToPx(131))
-                data.originalHeight=(BracketsUtility.dpToPx(131))
+                data.setHeight(BracketsUtility.dpToPx((sectionNumber+1) *131))
             } else if (sectionNumber == 1 && previousBracketSize != list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx(262))
-                data.originalHeight=(BracketsUtility.dpToPx(262))
+                data.setHeight(BracketsUtility.dpToPx(((sectionNumber+1) *131)))
             } else if (sectionNumber == 1 && previousBracketSize == list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx(131))
-                data.originalHeight=BracketsUtility.dpToPx(131)
+                data.setHeight(BracketsUtility.dpToPx((sectionNumber+1) *131))
             } else if (previousBracketSize > list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx(262))
-                data.originalHeight=BracketsUtility.dpToPx(262)
+                data.height = BracketsUtility.dpToPx(((sectionNumber+1) *131))
             } else if (previousBracketSize == list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx(131))
-                data.originalHeight = BracketsUtility.dpToPx(131)
-            }else{
-                data.height=BracketsUtility.dpToPx(262)
+                data.originalHeight = BracketsUtility.dpToPx((sectionNumber + 1) * 131)
+            }*/
 
-            }
-            if(isWinnerFinalSection){
-                data.height=BracketsUtility.dpToPx(131*(sectionNumber+1))
-            }
-
-            if(isLastSection){
-                data.height=BracketsUtility.dpToPx(262)
-            }
             if(!Test.listParticipant.contains(data.competitorTwo.name)){
                 Test.listParticipant.add(data.competitorTwo.name)
             }

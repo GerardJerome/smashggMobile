@@ -90,23 +90,30 @@ class BracketsColomnFragment(
                     || data.competitorOne.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0
                     || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorOne.name)==0
                     || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0)
-            val newPlayer = Test.listParticipant.size>0 && (!Test.listParticipant.contains(data.competitorOne.name) && data.competitorOne.name.compareTo("TBD")!=0)
+            val newPlayer = Test.listParticipant.size>0
+                    && (!Test.listParticipant.contains(data.competitorOne.name) && data.competitorOne.name.compareTo("TBD")!=0)
                     || (!Test.listParticipant.contains(data.competitorTwo.name) && data.competitorTwo.name.compareTo("TBD")!=0)
                     || isLooser && (!data.competitorOne.isFromLooser || !data.competitorTwo.isFromLooser)
-            if(sectionNumber==0){
+
+
+            if(sectionNumber==0 && data.visible){
                     data.height = BracketsUtility.dpToPx(131)
-            }else if(!playerFromLastMatch ){
-                if(indexToRefer >= lastList.size){
+            }else if(sectionNumber==0 && !data.visible){
+                data.height=BracketsUtility.dpToPx(131)
+            } else if(sectionNumber!=0 && !newPlayer  ){
+                if(indexToRefer >= lastList.size || lastList[indexToRefer].height==0){
                     data.height = BracketsUtility.dpToPx(131)
-                }else {
-                    data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height)
+                }else  {
+                    data.height = lastList[indexToRefer].height+BracketsUtility.dpToPx((sectionNumber-1)*131)
                 }
                 indexToRefer+=2
-            }else if(playerFromLastMatch && sectionNumber!=0){
+            }else if((newPlayer) && sectionNumber!=0){
                 if(indexToRefer>= lastList.size){
                     data.height = BracketsUtility.dpToPx(131)
                 }else {
-                    data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height + 131)
+                    data.height = lastList[indexToRefer].height
+
+                    //data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height)
                 }
                 indexToRefer++
             }

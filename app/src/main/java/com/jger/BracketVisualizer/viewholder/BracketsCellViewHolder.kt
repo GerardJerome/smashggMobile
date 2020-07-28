@@ -18,6 +18,7 @@ class BracketsCellViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     val teamOneScore: TextView
     val teamTwoScore: TextView
     val identifier : TextView
+
     private var animation: Animation? = null
     private val rootLayout: RelativeLayout
     fun setAnimation(height: Int) {

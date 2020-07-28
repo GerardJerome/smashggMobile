@@ -13,6 +13,7 @@ public class MatchData implements Serializable {
     private int height;
     private int OriginalHeight;
     private String identifier;
+    private Boolean isVisible=true;
 
     public int getHeight() {
         return height;
@@ -34,6 +35,23 @@ public class MatchData implements Serializable {
         this.competitorOne = competitorOne;
         this.competitorTwo = competitorTwo;
         this.identifier=identifier;
+    }
+
+    public MatchData(CompetitorData competitorOne, CompetitorData competitorTwo, int height, int originalHeight, String identifier, Boolean isVisible) {
+        this.competitorOne = competitorOne;
+        this.competitorTwo = competitorTwo;
+        this.height = height;
+        OriginalHeight = originalHeight;
+        this.identifier = identifier;
+        this.isVisible = isVisible;
+    }
+
+    public Boolean getVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(Boolean visible) {
+        isVisible = visible;
     }
 
     public CompetitorData getCompetitorTwo() {

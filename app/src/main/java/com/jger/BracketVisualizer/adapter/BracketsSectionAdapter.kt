@@ -21,7 +21,7 @@ class BracketsSectionAdapter(
 ) : FragmentStatePagerAdapter(fm) {
     override fun getItem(position: Int): Fragment {
         val bundle = Bundle()
-        sectionList = formatFirstRound(sectionList)
+//        sectionList= formatLastWinnerRound(sectionList)
         bundle.putSerializable("colomn_data", sectionList[position])
         val fragment = BracketsColomnFragment(isLooser,this)
         bundle.putInt("section_number", position)
@@ -45,28 +45,9 @@ class BracketsSectionAdapter(
         return fragment
     }
 
-    private fun formatFirstRound(sectionList: ArrayList<ColomnData>): ArrayList<ColomnData> {
-        val colomnData = null
-        val newMatchList = ArrayList<MatchData>()
-        if(sectionList[0].matches.size<sectionList[1].matches.size) {
 
-            for( i in 1..sectionList[1].matches.size){
-                newMatchList.add(MatchData(CompetitorData("","",false),
-                    CompetitorData("VIDE","",false),131,0,"A",false))
-            }
-            for (match in sectionList[0].matches) {
-                for (nextMatch in sectionList[1].matches) {
-                    if (match.competitorOne.name == nextMatch.competitorOne.name || match.competitorOne.name == nextMatch.competitorTwo.name || match.competitorTwo.name == nextMatch.competitorOne.name || match.competitorTwo.name == nextMatch.competitorTwo.name) {
-                        newMatchList[sectionList[1].matches.indexOf(nextMatch)] = match
-                    }
-                }
-            }
 
-            sectionList[0].matches=newMatchList
-        }
 
-        return sectionList
-    }
 
     override fun getCount(): Int {
         return sectionList.size

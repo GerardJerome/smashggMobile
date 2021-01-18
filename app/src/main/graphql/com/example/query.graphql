@@ -146,7 +146,7 @@ query Temp($pattern : String!) {
             name: $pattern
         }
         page: 1
-        perPage: 999
+        perPage: 500
     }) {
         pageInfo {
             total,

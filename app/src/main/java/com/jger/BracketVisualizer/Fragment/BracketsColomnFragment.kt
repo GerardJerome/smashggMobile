@@ -100,14 +100,19 @@ class BracketsColomnFragment(
                     data.height = BracketsUtility.dpToPx(131)
             }else if(sectionNumber==0 && !data.visible){
                 data.height=BracketsUtility.dpToPx(131)
-            } else if(sectionNumber!=0 && !newPlayer  ){
+            } else if(sectionNumber!=0 && !newPlayer && !isLastSection ){
                 if(indexToRefer >= lastList.size || lastList[indexToRefer].height==0){
                     data.height = BracketsUtility.dpToPx(131)
                 }else  {
-                    data.height = lastList[indexToRefer].height+BracketsUtility.dpToPx((sectionNumber-1)*131)
+                    if (list.size==1 && sectionNumber!=0){
+                        data.height= lastList[indexToRefer].height+BracketsUtility.dpToPx(131)
+                    }else {
+                        data.height =
+                            lastList[indexToRefer].height + BracketsUtility.dpToPx((sectionNumber - 1) * 131)
+                    }
                 }
                 indexToRefer+=2
-            }else if((newPlayer) && sectionNumber!=0){
+            }else if((newPlayer) && sectionNumber!=0 && !isLastSection){
                 if(indexToRefer>= lastList.size){
                     data.height = BracketsUtility.dpToPx(131)
                 }else {
@@ -116,6 +121,8 @@ class BracketsColomnFragment(
                     //data.height = BracketsUtility.dpToPx(lastList[indexToRefer].height)
                 }
                 indexToRefer++
+            }else if(isLastSection){
+                data.height = lastList[indexToRefer].height
             }
             colomnData?.matches=list
             bracketsSectionAdapter.sectionList[bracketsSectionAdapter.sectionList.indexOf(

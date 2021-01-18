@@ -27,6 +27,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
     var adapter = SearchViewCustomAdapter(this, ArrayList())
+    var currentTempQuery : TempQuery? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,19 +56,34 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if(currentTempQuery!=null){
+                    ApolloUtil.apolloClient.query(currentTempQuery!!).cancel()
+                }
                 acceuilText.visibility=View.GONE
                 if (newText!!.length > 2) {
+                    var textToQuery = newText.split(" ")
+                    currentTempQuery= TempQuery(textToQuery[0])
                     ApolloUtil.apolloClient
-                        .query(TempQuery(newText)).requestHeaders(ApolloUtil.clientHeader)
+                        .query(currentTempQuery!!).requestHeaders(ApolloUtil.clientHeader)
                         .enqueue(object : ApolloCall.Callback<TempQuery.Data>() {
                             override fun onFailure(e: ApolloException) {
+                                currentTempQuery=null
                                 FirebaseCrashlytics.getInstance()
                                     .log("Problème dans la requète de recherche de tournoi (pattern : $newText) : ${e.message}")
                             }
 
                             override fun onResponse(response: Response<TempQuery.Data>) {
+                                currentTempQuery=null
+                                if(textToQuery.size<=1){
                                     adapter.updateList(response.data!!.tournaments!!.nodes)
                                     RequestCountUtil.counter++
+                                }else{
+                                    for(i in 1 until textToQuery.size){
+                                        val filteredList = response.data!!.tournaments!!.nodes!!.filter { node -> node!!.name!!.contains(textToQuery[i])  }
+                                        adapter.updateList(filteredList)
+                                    }
+                                }
+
                             }
 
                         })

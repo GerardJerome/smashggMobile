@@ -182,6 +182,7 @@ class BracketsFragment(
 
     private fun intialiseViewPagerAdapter() {
         Test.listParticipant.clear()
+        sectionList = formatFirstRound(sectionList!!)
         sectionAdapter = BracketsSectionAdapter(childFragmentManager, sectionList!!,isLooser)
         viewPager!!.offscreenPageLimit = 10
         viewPager!!.adapter = sectionAdapter
@@ -189,6 +190,32 @@ class BracketsFragment(
         viewPager!!.pageMargin = -200
         viewPager!!.isHorizontalFadingEdgeEnabled = true
         viewPager!!.setFadingEdgeLength(50)
+    }
+    private fun formatFirstRound(sectionList: ArrayList<ColomnData>): ArrayList<ColomnData> {
+        val colomnData = null
+        val newMatchList = ArrayList<MatchData>()
+        if(sectionList[0].matches.size<sectionList[1].matches.size) {
+
+            for( i in 1..sectionList[1].matches.size){
+                newMatchList.add(MatchData(CompetitorData("","",false),
+                    CompetitorData("VIDE","",false),131,0,"A",false))
+            }
+            for (match in sectionList[0].matches) {
+                for (nextMatch in sectionList[1].matches) {
+                    if (match.competitorOne.name == nextMatch.competitorOne.name || match.competitorOne.name == nextMatch.competitorTwo.name || match.competitorTwo.name == nextMatch.competitorOne.name || match.competitorTwo.name == nextMatch.competitorTwo.name) {
+                        newMatchList[sectionList[1].matches.indexOf(nextMatch)] = match
+                    }
+                }
+            }
+
+            sectionList[0].matches=newMatchList
+        }
+
+        if(!isLooser){
+            val col = sectionList[sectionList.size-1].matches
+            col.remove(sectionList[sectionList.size-1].matches[sectionList[sectionList.size-1].matches.size-1])
+        }
+        return sectionList
     }
 
     private fun initViews() {

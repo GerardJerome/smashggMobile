@@ -17,7 +17,6 @@ class BracketsCellViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     val teamTwoName: TextView
     val teamOneScore: TextView
     val teamTwoScore: TextView
-    val identifier : TextView
 
     private var animation: Animation? = null
     private val rootLayout: RelativeLayout
@@ -38,7 +37,6 @@ class BracketsCellViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         teamOneScore = itemView.findViewById<View>(R.id.team_one_score) as TextView
         teamTwoScore = itemView.findViewById<View>(R.id.team_two_score) as TextView
         rootLayout = itemView.findViewById<View>(R.id.layout_root) as RelativeLayout
-        identifier = itemView.findViewById(R.id.team_title)
 
     }
 }

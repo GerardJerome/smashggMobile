@@ -1,6 +1,7 @@
 package com.jger.BracketVisualizer.Fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,36 +86,47 @@ class BracketsColomnFragment(
 
     private fun setInitialHeightForList() {
         var indexToRefer = 0
+        var dataIndex=0
         for (data in list!!) {
-            val playerFromLastMatch  = sectionNumber!=0 && lastList.size>list.indexOf(data) &&   (data.competitorOne.name.compareTo(lastList[list.indexOf(data)].competitorOne.name)==0
-                    || data.competitorOne.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0
-                    || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorOne.name)==0
-                    || data.competitorTwo.name.compareTo(lastList[list.indexOf(data)].competitorTwo.name)==0)
+            dataIndex++
             val newPlayer = Test.listParticipant.size>0
                     && (!Test.listParticipant.contains(data.competitorOne.name) && data.competitorOne.name.compareTo("TBD")!=0)
                     || (!Test.listParticipant.contains(data.competitorTwo.name) && data.competitorTwo.name.compareTo("TBD")!=0)
                     || isLooser && (!data.competitorOne.isFromLooser || !data.competitorTwo.isFromLooser)
 
-
+            //si première colonne
             if(sectionNumber==0 && data.visible){
-                    data.height = BracketsUtility.dpToPx(131)
+                    Log.d("JGERARD","--------------------------VISIBLE---------------")
+                    Log.d("JGERARD",data.identifier)
+                    Log.d("JGERARD",dataIndex.toString())
+                    Log.d("JGERARD", (dataIndex*131).toString())
+                    Log.d("JGERARD",(dataIndex*BracketsUtility.dpToPx(131)).toString())
+                    data.height = dataIndex*BracketsUtility.dpToPx(131)
+                Log.d("JGERARD","--------------------------FIN VISIBLE---------------")
             }else if(sectionNumber==0 && !data.visible){
-                data.height=BracketsUtility.dpToPx(131)
+                Log.d("JGERARD","--------------------------PASVISIBLE---------------")
+                Log.d("JGERARD",data.identifier)
+                Log.d("JGERARD",dataIndex.toString())
+                Log.d("JGERARD", (dataIndex*131).toString())
+                Log.d("JGERARD",(dataIndex*BracketsUtility.dpToPx(131)).toString())
+                data.height=dataIndex*BracketsUtility.dpToPx(131)
+                Log.d("JGERARD","--------------------------FIN PASVISIBLE---------------")
+                //si pas première colonne et les 2 joueurs ont déjà joué un match et que ce n'est pas le reset GF
             } else if(sectionNumber!=0 && !newPlayer && !isLastSection ){
                 if(indexToRefer >= lastList.size || lastList[indexToRefer].height==0){
-                    data.height = BracketsUtility.dpToPx(131)
+                    data.height = dataIndex*BracketsUtility.dpToPx(131)
                 }else  {
                     if (list.size==1 && sectionNumber!=0){
-                        data.height= lastList[indexToRefer].height+BracketsUtility.dpToPx(131)
+                        data.height= (lastList[indexToRefer].height+lastList[indexToRefer+1].height)%2
                     }else {
                         data.height =
-                            lastList[indexToRefer].height + BracketsUtility.dpToPx((sectionNumber - 1) * 131)
+                            (lastList[indexToRefer].height +BracketsUtility.dpToPx(131))
                     }
                 }
                 indexToRefer+=2
             }else if((newPlayer) && sectionNumber!=0 && !isLastSection){
                 if(indexToRefer>= lastList.size){
-                    data.height = BracketsUtility.dpToPx(131)
+                    data.height = dataIndex*BracketsUtility.dpToPx(131)
                 }else {
                     data.height = lastList[indexToRefer].height
 
@@ -130,28 +142,16 @@ class BracketsColomnFragment(
             ) + 1] = colomnData!!
 
 
-            /////////////////////////////////////////////////////////////////////////////////////////
-            /*if(newPlayer || previousBracketSize< list.size || isLastSection && sectionNumber!=0){
-               data.height=(BracketsUtility.dpToPx((sectionNumber) * 131))
-            }else if (sectionNumber == 0) {
-                data.setHeight(BracketsUtility.dpToPx((sectionNumber+1) *131))
-            } else if (sectionNumber == 1 && previousBracketSize != list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx(((sectionNumber+1) *131)))
-            } else if (sectionNumber == 1 && previousBracketSize == list!!.size && !newPlayer) {
-                data.setHeight(BracketsUtility.dpToPx((sectionNumber+1) *131))
-            } else if (previousBracketSize > list!!.size && !newPlayer) {
-                data.height = BracketsUtility.dpToPx(((sectionNumber+1) *131))
-            } else if (previousBracketSize == list!!.size && !newPlayer) {
-                data.originalHeight = BracketsUtility.dpToPx((sectionNumber + 1) * 131)
-            }*/
-
             if(!Test.listParticipant.contains(data.competitorTwo.name)){
                 Test.listParticipant.add(data.competitorTwo.name)
             }
             if(!Test.listParticipant.contains(data.competitorOne.name)){
                 Test.listParticipant.add(data.competitorOne.name)
             }
+
+
         }
+
     }
 
     fun expandHeight(height: Int) {

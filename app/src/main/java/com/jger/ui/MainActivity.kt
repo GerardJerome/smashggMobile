@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                                     RequestCountUtil.counter++
                                 }else{
                                     for(i in 1 until textToQuery.size){
+                                        Log.d("JGERARD",response.data!!.tournaments!!.nodes!![0]!!.name)
                                         val filteredList = response.data!!.tournaments!!.nodes!!.filter { node -> node!!.name!!.contains(textToQuery[i])  }
                                         adapter.updateList(filteredList)
                                     }

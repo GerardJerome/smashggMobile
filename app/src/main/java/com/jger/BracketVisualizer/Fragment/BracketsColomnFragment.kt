@@ -85,7 +85,10 @@ class BracketsColomnFragment(
         }
 
     private fun setInitialHeightForList() {
-        var indexToRefer = 0
+        for (data in list!!){
+            data.height = BracketsUtility.dpToPx(120);
+        }
+        /*var indexToRefer = 0
         var dataIndex=0
         for (data in list!!) {
             dataIndex++
@@ -150,7 +153,7 @@ class BracketsColomnFragment(
             }
 
 
-        }
+        }*/
 
     }
 

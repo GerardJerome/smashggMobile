@@ -12,6 +12,6 @@ class ApolloUtil {
             OkHttpClient.Builder().addNetworkInterceptor(StethoInterceptor()).build()
         ).serverUrl("https://api.smash.gg/gql/alpha").build()
 
-        var clientHeader = RequestHeaders.builder().addHeader("Authorization","Bearer 9142ebbff4a41382721a99c83ae7acc0").build()
+        var clientHeader = RequestHeaders.builder().addHeader("Authorization","Bearer ac7d17373569e42d716d7b98d94170ff").build()
     }
 }

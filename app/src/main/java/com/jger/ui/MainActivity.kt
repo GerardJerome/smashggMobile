@@ -15,6 +15,7 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.example.TempQuery
 import com.example.TournamentQuery
+import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jger.R
 import com.jger.transferClass.EventTransfer
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     var currentTempQuery : TempQuery? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         TournamentRecyclerView.adapter = adapter
@@ -68,8 +70,7 @@ class MainActivity : AppCompatActivity() {
                         .enqueue(object : ApolloCall.Callback<TempQuery.Data>() {
                             override fun onFailure(e: ApolloException) {
                                 currentTempQuery=null
-                                FirebaseCrashlytics.getInstance()
-                                    .log("Problème dans la requète de recherche de tournoi (pattern : $newText) : ${e.message}")
+                                Log.e("JGERSMASH",e.message)
                             }
 
                             override fun onResponse(response: Response<TempQuery.Data>) {
